@@ -1,0 +1,21 @@
+// Ejemplo: Instrucciones del enunciado del profesor //
+num1 Entero;      nombre Texto;      n1 Real;      asis Logico;
+b Entero;   A Entero;   suma Entero;   num2 Entero;   num3 Entero;   pi Real;
+
+nombre = Captura.Texto();      n1 = Captura.Real();
+num1 = Captura.Entero();      asis = Captura.Logico();
+
+b = 7;
+A=b;
+num2 = 2;  num3 = 3;
+suma=num1+(num2*num3);
+nombre="Alejandra";
+pi=3,1416;
+
+Mensaje.Texto("Esto es una prueba");
+Mensaje.Texto("");
+Mensaje.Texto(suma);
+
+Si (num1 > 5)
+Sino
+FinSi

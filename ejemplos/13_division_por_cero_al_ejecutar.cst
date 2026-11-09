@@ -1,0 +1,6 @@
+// Ejemplo: División por cero al ejecutar (escriba 0 cuando se lo pida) //
+divisor Entero;
+resultado Real;
+divisor = Captura.Entero();
+resultado = 100 / divisor;
+Mensaje.Texto("Resultado: " + resultado);

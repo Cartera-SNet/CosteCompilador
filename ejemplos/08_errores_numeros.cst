@@ -1,0 +1,10 @@
+// Ejemplo: Errores léxicos en números //
+a = 3.1416;
+b = 3,;
+c = 1,2,3;
+d = 007;
+e = 5abc;
+f = .5;
+g = 2147483648;
+h = ,5;
+valido = 0,5;

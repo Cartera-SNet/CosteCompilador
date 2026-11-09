@@ -1,0 +1,13 @@
+// Ejemplo: Errores con paréntesis y operadores //
+num Entero;
+a Entero;
+b Entero;
+a = 1;
+b = 2;
+num = 1(;
+num = 1 + (;
+num = (a + b;
+num = a + b);
+num = a b;
+num = (a + b)(a);
+num = 5 5;

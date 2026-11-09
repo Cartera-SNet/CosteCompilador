@@ -1,0 +1,18 @@
+// Ejemplo: Errores de sintaxis //
+edad Entero
+nombre Texto;
+Hola Mundo
+edad = ;
+Entero x;
+resultado Real;
+resultado = (5 + 3;
+Mensaje.Texto();
+x = Captura.Fecha();
+Si(edad > 5)
+    Mensaje.Texto("mayor")
+Sino Mensaje.Texto("menor");
+FinSi
+Si (edad = 5)
+FinSi
+Si (edad > 1)
+    Mensaje.Texto("a este Si le falta el FinSi");

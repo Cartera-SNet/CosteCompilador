@@ -1,0 +1,13 @@
+# claves y datos locales: NUNCA se suben al repositorio
+ia_config.json
+.env
+costenol_error.log
+
+# archivos generados
+__pycache__/
+*.pyc
+dist/
+build_exe/
+Costenol.exe
+Costenol
+*.jar

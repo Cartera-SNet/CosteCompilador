@@ -1,0 +1,18 @@
+// Ejemplo: Errores de significado (semánticos) //
+edad Entero;
+nombre Texto;
+nombre Entero;
+edad = "veinte";
+total = 5;
+nombre = edad + 1;
+edad = Captura.Texto();
+Si (edad)
+FinSi
+Si (nombre > "a")
+FinSi
+Mensaje.Texto(otra);
+x Entero;
+Mensaje.Texto(x);
+r Real;
+r = 5 / 0;
+edad = 10 / 2;

@@ -1,0 +1,181 @@
+﻿COMPILADOR COSTEÑOL  -  versión 1.0
+==================================
+
+Compila, EJECUTA y EXPORTA programas escritos en Costeñol, con un asistente de IA que
+ayuda a escribirlos. Fases del compilador:
+  1. Análisis léxico        costenol_lexico.py
+  2. Análisis sintáctico    costenol_sintactico.py   (árbol sintáctico)
+  3. Análisis semántico     costenol_semantico.py    (tabla de símbolos)
+  4. Ejecución              costenol_ejecucion.py    (corre el programa)
+Todo está en Python. La carpeta web/ (HTML, CSS y JavaScript) solo dibuja la
+interfaz y muestra los resultados.
+
+CÓMO ABRIRLO
+  Opción A (con Python):  doble clic en  ejecutar.bat
+  Opción B (sin Python):  doble clic en  Costenol.exe   (ver "CONSTRUIR EL .EXE")
+  Se abre el navegador con la ventana del compilador. (Si no se abre solo, copie en
+  el navegador la dirección que aparece en la ventana negra: http://127.0.0.1:8765/ )
+  Para salir, use la X de la esquina superior derecha de la ventana del compilador.
+  Requisito de la opción A: Python 3.8 o superior. No hay que instalar nada más.
+  Sin Windows:  python3 app.py
+
+CÓMO USARLO (el detalle está en el botón "Manual de uso")
+  - Escriba el programa en el editor, por ejemplo:   Mensaje.Texto("Hola Mundo");
+  - EJECUTAR (F5): revisa el programa y, si no tiene errores, lo corre y muestra el
+    resultado en "Salida del Programa". Si el programa usa Captura, aparece una casilla
+    para escribir el dato (el programa debe avisar qué pide con Mensaje.Texto).
+  - COMPILAR (F7): solo revisa el programa; no lo ejecuta.
+  - Los errores se muestran con su línea y columna y se marcan en el editor.
+
+MENSAJES EN COSTEÑO
+  Los errores y advertencias hablan como costeño, con el formato que pidió el profesor:
+      <saludo> en la línea N. Error <léxico|sintáctico|semántico|de ejecución>: <causa>.
+  Ejemplo:  Pilas, compa, algo falló en la línea 5. Error semántico: la variable 'x' no está declarada.
+  En Configuración se pueden cambiar a español formal. Todas las frases están en tablas dentro de
+  costenol_dialecto.py (APERTURAS_ERROR, APERTURAS_AVISO y CAUSAS): para mejorar el "habla" solo hay
+  que editar esas tablas; una prueba (pruebas_dialecto.py) exige una frase por cada código de error.
+
+MANUAL DE PROGRAMADOR
+  MANUAL_PROGRAMADOR.md explica a otro desarrollador cómo está hecho el compilador: módulos y
+  clases, forma del árbol, convenciones y prefijos de variables, API, cómo agregar cosas, límites,
+  pruebas, despliegue, preguntas para la sustentación y casos de prueba para la presentación.
+
+AUTOCOMPLETADO  (en el editor)
+  Al escribir aparece en gris cómo seguir y, si hay varias opciones, una lista. Tab completa.
+    Mens  -> Mensaje.Texto("")   (el cursor queda entre las comillas)
+    Ca    -> Captura.Entero(); / Real / Texto / Logico
+    Si    -> Si (…) + línea con sangría + FinSi
+    edad En -> edad Entero;      (tipos de dato tras el nombre de una variable)
+    las primeras letras de una variable ya declarada -> su nombre
+  Flechas arriba/abajo cambian la opción, Esc cierra la lista y se puede apagar en Configuración.
+  No sugiere dentro de textos entre comillas ni de comentarios.
+
+VERSIÓN EN LÍNEA (RAILWAY)
+  El .zip "Costenol_Railway" ya trae todo lo necesario para montarlo en Railway con Serverless
+  (sleep) activado: railway.json, Procfile, requirements.txt, .python-version, .gitignore y la
+  guía RAILWAY.md (pasos, variables, límites y problemas frecuentes).
+  En ese modo (python app.py --nube) el servidor escucha en el puerto PORT, no hace nada en
+  segundo plano para poder dormirse, protege la clave de IA y limita el uso del asistente.
+
+EXPORTAR  (botón "Exportar")
+  Convierte un programa SIN errores en un archivo que se ejecuta fuera del compilador. El
+  navegador pregunta en qué carpeta guardarlo (Chrome/Edge; en otros va a Descargas).
+    Python (.py)            python programa.py
+    JavaScript (.js)        node programa.js
+    Página web (.html)      doble clic (no necesita instalar nada)
+    Java (Programa.java)    javac Programa.java   y   java Programa
+    Java ejecutable (.jar)  java -jar programa.jar   (para CONSTRUIRLO hace falta un JDK:
+                            los programas javac y jar; si no hay, la opción sale desactivada)
+  El programa exportado hace lo mismo que el compilador (mismos resultados, formato de
+  números, validación de datos y errores de ejecución). Está comprobado con pruebas que
+  comparan cada formato contra el intérprete (pruebas_exportar.py).
+  Código: costenol_exportar.py.
+
+ASISTENTE DE IA  (botón "Asistente IA")
+  Escribe programas en Costeñol y responde preguntas del lenguaje y del compilador.
+  Todo el código que entrega se COMPILA con el compilador real; si tiene errores, se le
+  piden correcciones automáticamente (hasta 2 veces) antes de mostrarlo.
+  Para usarlo hace falta una clave de API de Anthropic:
+    1. Cree la clave en  console.anthropic.com  (menú API Keys). El uso se cobra por
+       consumo, aparte de cualquier suscripción de Claude.
+    2. En el asistente, pulse el engranaje, pegue la clave y "Guardar".
+       (También sirve la variable de entorno ANTHROPIC_API_KEY.)
+  - ESTE .zip DE ESCRITORIO YA TRAE LA CLAVE PUESTA (archivo ia_config.json): el asistente funciona
+    desde el primer uso, tanto con ejecutar.bat como con el .exe (construir_exe.bat copia
+    ia_config.json junto a Costenol.exe). Quien reciba esa carpeta podrá usar su clave: para
+    entregar o compartir el proyecto, borre ia_config.json antes.
+  - La clave se guarda en  ia_config.json  junto al programa. NO comparta ese archivo ni
+    lo incluya al entregar el proyecto: bórrelo antes (el .zip entregado no lo trae).
+  - El modelo predeterminado es claude-sonnet-5-5; se puede cambiar en el mismo engranaje.
+  - Con el asistente, la pregunta (y el código, si la casilla está marcada) viaja por
+    internet a Anthropic. El compilador en sí funciona sin internet.
+
+CONSTRUIR EL .EXE
+  1. Haga doble clic en  construir_exe.bat   (necesita Python y, la primera vez, internet
+     para instalar PyInstaller).
+  2. Al terminar aparece  Costenol.exe  (y una copia en la carpeta dist\), con el logo del
+     compilador como ícono. Funciona sin Python instalado.
+  - Para construirlo con una ventana negra de mensajes (útil si algo falla):
+        construir_exe.bat --consola
+  - Junto al .exe se crean, solo si hacen falta: ia_config.json (clave del asistente) y
+    costenol_error.log (errores inesperados). Los programas de ejemplo y el manual van
+    dentro del .exe; si pone una carpeta "ejemplos" con archivos .cst junto al .exe, también
+    aparecerán en Ejemplos.
+  - Algunos antivirus desconfían de los .exe hechos con PyInstaller. Si pasa, permita el
+    archivo o use la opción A.
+
+ARCHIVOS
+  app.py                    Servidor local + lanzador (también el punto de entrada del .exe).
+  costenol_lexico.py        Fase 1 (aquí están las reglas léxicas y sus constantes).
+  costenol_sintactico.py    Fase 2.
+  costenol_semantico.py     Fase 3.
+  costenol_ejecucion.py     Fase 4.
+  costenol_compilador.py    Une las fases; sesiones de ejecución.
+  costenol_asistente.py     Asistente de IA (instrucciones del modelo con todas las reglas).
+  costenol_exportar.py      Exportar: genera Python, JavaScript, HTML, Java y .jar.
+  costenol_dialecto.py      Mensajes en costeño (frases en tablas editables).
+  MANUAL_PROGRAMADOR.md     Manual para otro desarrollador (módulos, clases, convenciones, pruebas).
+  pruebas_*.py              Pruebas automáticas (ver abajo).
+  web/                      Interfaz (index.html, estilos.css, app.js), manual.html e imágenes.
+  ejemplos/                 Programas .cst de ejemplo (válidos y con errores).
+  ejecutar.bat              Abre el compilador en Windows (con Python).
+  construir_exe.bat / .py   Construyen Costenol.exe.
+
+PRUEBAS  (no gastan dinero ni necesitan internet; el asistente se prueba con un servidor simulado)
+    python pruebas_lexico.py
+    python pruebas_compilador.py
+    python pruebas_asistente.py
+    python pruebas_servidor.py
+    python pruebas_dialecto.py
+    python pruebas_nube.py          (arranca el programa en modo nube y comprueba que responda)
+    python pruebas_exportar.py      (tarda ~1 minuto: compara cada formato con el intérprete; usa
+                                     Node.js y un JDK si están instalados, y omite lo que falte)
+  Si cambia el lenguaje y una prueba falla, hay que revisar el código o actualizar la
+  prueba Y el manual.
+
+MANTENER AL DÍA EL MANUAL Y EL ASISTENTE  (importante)
+  El manual está en  web/manual.html  (botón "Manual de uso").
+  Cada vez que cambie el lenguaje, una regla o la pantalla:
+    1. Actualice la sección que corresponda en web/manual.html. Cuando se PUBLIQUE una versión nueva
+       (hoy la 1.0 todavía no se ha lanzado), agregue una fila en "Historial de cambios" y suba el
+       número en index.html (el texto "Compilador v…" de la barra de estado y la ventana "Acerca de").
+    2. Si agrega un mensaje de error o advertencia, agréguelo al CATALOGO del módulo Python
+       correspondiente: el "Catálogo de mensajes" del manual se llena solo, y una prueba
+       falla si falta documentar un código.
+    3. Si cambia una regla del lenguaje, actualice también el exportador (costenol_exportar.py,
+       que traduce cada instrucción) e INSTRUCCIONES en
+       costenol_asistente.py (el asistente solo conoce lo que dice ahí) y la tabla de
+       reglas del manual.
+    4. Ejecute las pruebas: revisan que los ejemplos del manual y de las instrucciones del
+       asistente sigan compilando.
+
+REGLAS DEL LENGUAJE (resumen; completas en el manual, sección 2)
+  - Mayúsculas importan. Palabras reservadas (sin tilde): Entero Texto Real Logico
+    Captura Mensaje Si Sino FinSi Verdadero Falso.
+  - Declarar: nombre Tipo;      Asignar: nombre = valor;
+    Leer: nombre = Captura.Tipo();      Mostrar: Mensaje.Texto(valor);
+  - Condicional: Si (condición) ... Sino ... FinSi   (espacio después de Si; Sino y
+    FinSi solos en su línea; Sino es opcional; se pueden anidar).
+  - Comentarios: // texto //     Decimales con coma: 3,1416
+  - Las variables se declaran una vez, fuera de los Si, antes de usarse, y solo
+    guardan valores de su tipo (un Entero sí cabe en un Real).
+  - Una variable NO puede llamarse como un tipo de dato ni como una palabra reservada, ni
+    cambiando mayúsculas: "entero Entero;" es un error (regla del profesor).
+  - La división (/) siempre da Real. + también une textos.
+
+PENDIENTE DE CONFIRMAR CON EL PROFESOR
+  Estas reglas NO están en el enunciado: son propuesta del equipo. Se pueden cambiar
+  fácilmente (constantes al inicio de cada módulo):
+    - Operadores de comparación  ==  !=  <  >  <=  >=  y el signo negativo.
+    - Valores del tipo Logico: Verdadero y Falso.
+    - Unir textos con + (también con números y valores lógicos).
+    - La división siempre da Real (no se puede guardar en un Entero).
+    - Declaraciones solo fuera de los Si; Sino opcional; Si dentro de Si.
+    - Mensaje.Texto muestra un valor (texto, número, variable u operación) y baja de línea.
+    - Límites: nombres de 30 caracteres, enteros hasta 2147483647.
+    - Aceptar comillas curvas “ ” además de las rectas ".
+    - Que el rechazo de nombres como "entero" o "si" valga para TODAS las palabras reservadas
+      (hoy se rechazan todas, con cualquier mayúscula), y no solo para los tipos de dato.
+    - Los formatos de Exportar (Python, JavaScript, HTML, Java, .jar): ¿el profesor espera
+      alguno en particular?
+    - Si se quiere una forma más corta de escribir Mensaje.Texto (ver conversación).

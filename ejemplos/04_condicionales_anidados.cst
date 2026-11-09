@@ -1,0 +1,13 @@
+// Ejemplo: Condicionales anidados //
+nota Real;
+nota = Captura.Real();
+
+Si (nota >= 3,0)
+    Si (nota >= 4,5)
+        Mensaje.Texto("Excelente");
+    Sino
+        Mensaje.Texto("Aprobado");
+    FinSi
+Sino
+    Mensaje.Texto("Reprobado");
+FinSi

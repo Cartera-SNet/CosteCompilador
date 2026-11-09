@@ -1,0 +1,20 @@
+// Ejemplo: Programa completo (lectura, operaciones y condicional) //
+nombre Texto;
+edad Entero;
+promedio Real;
+activo Logico;
+
+nombre = Captura.Texto();
+edad = Captura.Entero();
+promedio = (4,5 + 3,5) / 2;
+activo = edad >= 18;
+
+Mensaje.Texto("Hola " + nombre);
+Mensaje.Texto("Promedio: " + promedio);
+Mensaje.Texto(activo);
+
+Si (edad >= 18)
+    Mensaje.Texto("Mayor de edad");
+Sino
+    Mensaje.Texto("Menor de edad");
+FinSi

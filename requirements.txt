@@ -1,0 +1,2 @@
+# Costeñol no usa paquetes externos: solo la biblioteca estándar de Python.
+# Este archivo existe para que Railway reconozca el proyecto como una aplicación de Python.

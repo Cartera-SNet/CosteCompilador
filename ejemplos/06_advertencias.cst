@@ -1,0 +1,10 @@
+// Ejemplo: Programa válido con advertencias //
+edad Entero;
+Edad Entero;
+sobra Entero;
+sinUsar Entero;
+
+edad = 20;
+Edad = 30;
+sobra = 5;
+Mensaje.Texto(edad);

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiCompilador</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<!-- ============ Iconos (hoja de símbolos SVG) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-codigo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 7.5 3.7 12l4.5 4.5"/><path d="M15.8 7.5l4.5 4.5-4.5 4.5"/><path d="M13.3 5.8l-2.6 12.4"/></g></symbol>
+    <symbol id="i-min" viewBox="0 0 24 24"><path d="M5 12.5h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-max" viewBox="0 0 24 24"><rect x="5.5" y="5.5" width="13" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/></symbol>
+
+    <symbol id="i-nuevo" viewBox="0 0 24 24"><path d="M6 2.8h8l4.8 4.8V20a1.4 1.4 0 0 1-1.4 1.4H6A1.4 1.4 0 0 1 4.6 20V4.2A1.4 1.4 0 0 1 6 2.8z" fill="#2f7be8"/><path d="M14 2.8v4.8h4.8z" fill="#9cc4ff"/></symbol>
+    <symbol id="i-abrir" viewBox="0 0 24 24"><path d="M2.5 6.2A1.7 1.7 0 0 1 4.2 4.5h4.8l2.1 2.4h7.4A1.7 1.7 0 0 1 20.2 8.6v1.8H7.4a2 2 0 0 0-1.9 1.4L2.5 19.5z" fill="#24405f"/><path d="M5.7 11.7a1.3 1.3 0 0 1 1.3-.9h14.6a1 1 0 0 1 .95 1.3l-2.2 6.5a1.7 1.7 0 0 1-1.6 1.2H3.6z" fill="#3a5a84"/></symbol>
+    <symbol id="i-guardar" viewBox="0 0 24 24"><path d="M4.2 3.5h12.3l4 4v11.8a1.7 1.7 0 0 1-1.7 1.7H4.2a1.7 1.7 0 0 1-1.7-1.7V5.2a1.7 1.7 0 0 1 1.7-1.7z" fill="#2563c9"/><rect x="6.3" y="3.5" width="9.4" height="5.7" rx=".7" fill="#eaf0f8"/><rect x="12.3" y="4.6" width="2" height="3.5" fill="#2563c9"/><rect x="6" y="12.6" width="12" height="8" rx="1" fill="#eaf0f8"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M6.5 3.8v16.4a.7.7 0 0 0 1.05.6l13.4-8.2a.7.7 0 0 0 0-1.2L7.55 3.2a.7.7 0 0 0-1.05.6z" fill="#fff"/></symbol>
+    <symbol id="i-engranaje" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="12" r="7.2"/><rect x="10.4" y="1.6" width="3.2" height="20.8" rx="1.1"/><rect x="10.4" y="1.6" width="3.2" height="20.8" rx="1.1" transform="rotate(45 12 12)"/><rect x="10.4" y="1.6" width="3.2" height="20.8" rx="1.1" transform="rotate(90 12 12)"/><rect x="10.4" y="1.6" width="3.2" height="20.8" rx="1.1" transform="rotate(135 12 12)"/></g><circle cx="12" cy="12" r="3.1" style="fill:var(--hueco-icono,#fff)"/></symbol>
+
+    <symbol id="i-casa" viewBox="0 0 24 24"><path d="M12 2.8 1.6 12.2h3V21h5.6v-5.9h3.6V21h5.6v-8.8h3z" fill="currentColor"/></symbol>
+    <symbol id="i-documento" viewBox="0 0 24 24"><path d="M5.2 2.5h8.6l5 5V20.5a1.2 1.2 0 0 1-1.2 1.2H5.2A1.2 1.2 0 0 1 4 20.5V3.7a1.2 1.2 0 0 1 1.2-1.2z" fill="currentColor"/><path d="M7.7 12h8.6M7.7 15.4h8.6M7.7 18.7h5.4" style="stroke:var(--hueco-icono,#fff)" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-barras" viewBox="0 0 24 24"><rect x="2.8" y="12" width="4.8" height="9.2" rx=".9" fill="currentColor"/><rect x="9.6" y="7" width="4.8" height="14.2" rx=".9" fill="currentColor"/><rect x="16.4" y="2.8" width="4.8" height="18.4" rx=".9" fill="currentColor"/></symbol>
+    <symbol id="i-libro" viewBox="0 0 24 24"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19v15H6a2 2 0 0 0-2 2z" fill="currentColor"/><path d="M4 20a2 2 0 0 0 2 2h13v-2.4H6.3A.9.9 0 0 1 6 18" fill="currentColor" opacity=".75"/><path d="M8 7h7.5M8 10.2h7.5" style="stroke:var(--hueco-icono,#fff)" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="currentColor"/><circle cx="12" cy="7.4" r="1.45" style="fill:var(--hueco-icono,#fff)"/><path d="M12 11v6.2" style="stroke:var(--hueco-icono,#fff)" stroke-width="2.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-gorro" viewBox="0 0 64 48"><path d="M32 3 1.5 17.5 32 32l30.5-14.5z" fill="currentColor"/><path d="M13.5 26.5v10.2c0 5.2 8.2 9.3 18.5 9.3s18.5-4.1 18.5-9.3V26.5L32 35.3z" fill="currentColor"/><path d="M58 20.5v17" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="55.3" y="36" width="5.4" height="9" rx="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5 10 12l-6 5.5"/><path d="M12.5 18h7.5"/></g></symbol>
+    <symbol id="i-basura" viewBox="0 0 24 24"><g fill="currentColor"><path d="M9 3h6l.7 1.8H20V7H4V4.8h4.3z"/><path d="M5.6 8.4h12.8l-.9 11.4a1.7 1.7 0 0 1-1.7 1.6H8.2a1.7 1.7 0 0 1-1.7-1.6z"/></g><path d="M10 11v7M14 11v7" style="stroke:var(--hueco-icono,#fff)" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="i-arbol" viewBox="0 0 24 24"><g fill="currentColor"><rect x="9" y="2.5" width="6" height="5" rx="1.2"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.2"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.2"/></g><path d="M12 7.5v4.2M5.5 16.5v-4.8h13v4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-tabla" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="currentColor"/><path d="M3 9.5h18M3 14.5h18M9.5 9.5V20" style="stroke:var(--hueco-icono,#fff)" stroke-width="1.5"/></symbol>
+
+    <symbol id="i-asistente" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H15a2.5 2.5 0 0 1 2.5 2.5V10A2.5 2.5 0 0 1 15 12.5H9.2L5.5 16v-3.5H6.5A2.5 2.5 0 0 1 4 10z" fill="currentColor"/><path d="M18.2 12.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/><circle cx="8" cy="7.2" r="1.1" style="fill:var(--hueco-icono,#fff)"/><circle cx="12.2" cy="7.2" r="1.1" style="fill:var(--hueco-icono,#fff)"/></symbol>
+    <symbol id="i-chispa" viewBox="0 0 24 24"><path d="M12 2l2.1 6.2L20 10l-5.9 1.8L12 18l-2.1-6.2L4 10l5.9-1.8z" fill="currentColor"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor"/></symbol>
+    <symbol id="i-enviar" viewBox="0 0 24 24"><path d="M3.4 20.4 21 12 3.4 3.6 3.3 10.2 15 12 3.3 13.8z" fill="currentColor"/></symbol>
+    <symbol id="i-reiniciar" viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M4 4.5v5.3h5.3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-exportar" viewBox="0 0 24 24"><path d="M12 3v11" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" fill="none"/><path d="M7.5 7.5 12 3l4.5 4.5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4.5 12v6.2A1.8 1.8 0 0 0 6.3 20h11.4a1.8 1.8 0 0 0 1.8-1.8V12" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1f9d4a"/><path d="M6.6 12.5l3.7 3.7 7.1-7.6" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-ok-oscuro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1c3f2b"/><path d="M6.6 12.5l3.7 3.7 7.1-7.6" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-aviso" viewBox="0 0 24 24"><path d="M12 2.8 22.2 20.6H1.8z" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9.2v5.4" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="17.6" r="1.3" fill="#fff"/></symbol>
+    <symbol id="i-error" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#d93025"/><path d="M12 6.5v7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.5" fill="#fff"/></symbol>
+    <symbol id="i-error-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#d93025"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-pendiente" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#8a99ab"/><circle cx="7.3" cy="12" r="1.5" fill="#fff"/><circle cx="12" cy="12" r="1.5" fill="#fff"/><circle cx="16.7" cy="12" r="1.5" fill="#fff"/></symbol>
+  </defs>
+</svg>
+
+<div class="ventana" id="ventana">
+
+  <!-- ============ Barra de título ============ -->
+  <div class="barra-titulo">
+    <span class="logo-mini"><svg style="color:#3da0ff"><use href="#i-codigo"/></svg></span>
+    <span class="titulo-ventana">MiCompilador</span>
+    <div class="controles-ventana">
+      <button type="button" id="btn-min" title="Salir de pantalla completa" aria-label="Minimizar"><svg><use href="#i-min"/></svg></button>
+      <button type="button" id="btn-max" title="Pantalla completa" aria-label="Maximizar"><svg><use href="#i-max"/></svg></button>
+      <button type="button" id="btn-cerrar" title="Cerrar el compilador" aria-label="Cerrar"><svg><use href="#i-cerrar"/></svg></button>
+    </div>
+  </div>
+
+  <div class="cuerpo" id="cuerpo">
+
+    <!-- ============ Barra lateral ============ -->
+    <aside class="lateral">
+      <nav class="navegacion" aria-label="Navegación">
+        <button type="button" class="nav-item activo" data-nav="inicio" title="Volver al editor"><svg><use href="#i-casa"/></svg><span>Inicio</span></button>
+        <button type="button" class="nav-item" data-nav="ejemplos" title="Cargar programas de ejemplo (válidos y con errores)"><svg><use href="#i-documento"/></svg><span>Ejemplos</span></button>
+        <button type="button" class="nav-item" data-nav="analizador" title="Fases del compilador y tipos de token"><svg><use href="#i-barras"/></svg><span>Analizador</span></button>
+        <button type="button" class="nav-item" data-nav="asistente" title="Asistente de IA: le escribe programas en Costeñol y responde sus preguntas"><svg><use href="#i-asistente"/></svg><span>Asistente IA</span></button>
+        <button type="button" class="nav-item" data-nav="manual" title="Manual de uso: cómo escribir programas y usar el compilador"><svg><use href="#i-libro"/></svg><span>Manual de uso</span></button>
+        <button type="button" class="nav-item" data-nav="acerca" title="Información del proyecto"><svg><use href="#i-info"/></svg><span>Acerca de</span></button>
+      </nav>
+      <div class="logo-lateral"><img src="assets/logo_costenol_claro.png" alt="Costeñol Compilador"></div>
+    </aside>
+
+    <!-- ============ Zona principal ============ -->
+    <main class="principal">
+
+      <div class="herramientas">
+        <div class="grupo-archivo">
+          <button type="button" class="btn-herr" id="btn-nuevo" title="Nuevo: abre un archivo en blanco en una pestaña nueva"><svg><use href="#i-nuevo"/></svg>Nuevo</button>
+          <button type="button" class="btn-herr" id="btn-abrir" title="Abrir: carga un archivo .cst o .txt de su computador"><svg><use href="#i-abrir"/></svg>Abrir</button>
+          <button type="button" class="btn-herr" id="btn-guardar" title="Guardar: descarga el código como archivo .cst (Ctrl+S)"><svg><use href="#i-guardar"/></svg>Guardar</button>
+        </div>
+        <span class="separador" aria-hidden="true"></span>
+        <button type="button" class="btn-accion azul" id="btn-compilar" title="Compilar (F7): revisa el programa y muestra los errores, sin ejecutarlo"><svg><use href="#i-play"/></svg>Compilar</button>
+        <button type="button" class="btn-accion verde" id="btn-ejecutar" title="Ejecutar (F5): compila y, si no hay errores, corre el programa"><svg><use href="#i-play"/></svg>Ejecutar</button>
+        <button type="button" class="btn-claro" id="btn-exportar" title="Exportar: convierte el programa en un archivo que se ejecuta fuera del compilador (.py, .js, .html, .jar…)"><svg style="color:#1b5fc4"><use href="#i-exportar"/></svg>Exportar</button>
+        <span class="separador" aria-hidden="true"></span>
+        <button type="button" class="btn-claro" id="btn-config" title="Configuración: tamaño de letra y opciones"><svg style="color:#2b4a74"><use href="#i-engranaje"/></svg>Configuración</button>
+        <div class="proyecto">
+          <svg class="proyecto-icono" style="color:#2b4a74"><use href="#i-gorro"/></svg>
+          <div><strong>Proyecto</strong><span>Compiladores</span></div>
+        </div>
+        <input type="file" id="archivo-entrada" accept=".cst,.txt,.cos,text/plain" hidden>
+      </div>
+
+      <div class="zona-superior">
+
+        <!-- Editor -->
+        <section class="editor">
+          <div class="tira-archivos" id="tira-archivos"></div>
+          <div class="area-codigo" id="area-codigo">
+            <div class="numeros" id="numeros" aria-hidden="true"></div>
+            <div class="capa">
+              <div class="marcas" id="marcas" aria-hidden="true"><div class="linea-actual" id="linea-actual"></div></div>
+              <pre class="resaltado" id="resaltado" aria-hidden="true"></pre>
+              <div class="sug-lista" id="sug-lista" role="listbox" aria-label="Sugerencias" hidden></div>
+              <textarea id="codigo" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Código fuente en Costeñol"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- Salida del programa -->
+        <section class="salida">
+          <div class="salida-cabecera">
+            <svg><use href="#i-terminal"/></svg>
+            <span>Salida del Programa</span>
+            <button type="button" class="btn-limpiar" id="btn-limpiar" title="Limpiar: borra lo que se ve en la salida"><svg style="--hueco-icono:#e8f0fb"><use href="#i-basura"/></svg>Limpiar</button>
+          </div>
+          <div class="consola" id="consola" role="log" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <!-- Paneles inferiores -->
+      <section class="inferior" data-grupo="inferior">
+        <div class="pestanas">
+          <button type="button" class="pestana activa" data-tab="mensajes" title="Resumen del proceso de compilación"><svg style="color:#1b72e8"><use href="#i-info"/></svg>Mensajes</button>
+          <button type="button" class="pestana" data-tab="errores" title="Errores con su línea y columna (clic para ir a la línea)"><svg><use href="#i-error"/></svg>Errores<span class="contador rojo" id="cnt-errores" hidden>0</span></button>
+          <button type="button" class="pestana" data-tab="advertencias" title="Avisos que no impiden compilar"><svg><use href="#i-aviso"/></svg>Advertencias<span class="contador ambar" id="cnt-advertencias" hidden>0</span></button>
+          <button type="button" class="pestana" data-tab="reporte" title="Lista completa de tokens (resultado del análisis léxico)"><svg style="color:#3a5a84"><use href="#i-documento"/></svg>Reporte</button>
+          <button type="button" class="pestana" data-tab="arbol" title="Árbol sintáctico: estructura del programa (resultado del análisis sintáctico)"><svg style="color:#3a5a84"><use href="#i-arbol"/></svg>Árbol Sintáctico</button>
+          <button type="button" class="pestana" data-tab="simbolos" title="Tabla de símbolos: las variables del programa y su tipo"><svg style="color:#3a5a84"><use href="#i-tabla"/></svg>Tabla de Símbolos</button>
+        </div>
+        <div class="contenido-pestana">
+          <div class="panel activo" data-pane="mensajes" id="pane-mensajes"></div>
+          <div class="panel" data-pane="errores" id="pane-errores"></div>
+          <div class="panel" data-pane="advertencias" id="pane-advertencias"></div>
+          <div class="panel" data-pane="reporte" id="pane-reporte"></div>
+          <div class="panel" data-pane="arbol" id="pane-arbol"></div>
+          <div class="panel" data-pane="simbolos" id="pane-simbolos"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ Asistente de IA ============ -->
+    <aside class="asistente" id="asistente" aria-label="Asistente de IA" hidden>
+      <div class="asi-cab">
+        <svg class="asi-logo"><use href="#i-chispa"/></svg>
+        <strong>Asistente de Costeñol</strong>
+        <button type="button" id="asi-nuevo" title="Nueva conversación" aria-label="Nueva conversación"><svg><use href="#i-reiniciar"/></svg></button>
+        <button type="button" id="asi-ajustes" title="Clave de API y modelo" aria-label="Ajustes del asistente"><svg><use href="#i-engranaje"/></svg></button>
+        <button type="button" id="asi-cerrar" title="Cerrar el asistente" aria-label="Cerrar el asistente"><svg><use href="#i-cerrar"/></svg></button>
+      </div>
+      <div class="asi-config" id="asi-config" hidden>
+        <p class="asi-ayuda"><strong>Conectar el asistente.</strong> Necesita una clave de API de Anthropic: se crea en <em>console.anthropic.com</em> (API Keys). El uso de la API se cobra por consumo, aparte de cualquier suscripción de Claude. La clave se guarda solo en este computador y solo se envía a Anthropic.</p>
+        <label>Clave de API
+          <input type="password" id="asi-clave" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
+        </label>
+        <label>Modelo
+          <input type="text" id="asi-modelo" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="asi-botones">
+          <button type="button" class="btn-pequeno azul" id="asi-guardar">Guardar</button>
+          <button type="button" class="btn-pequeno" id="asi-quitar">Quitar la clave</button>
+        </div>
+        <p class="asi-estado" id="asi-estado-clave" role="status"></p>
+      </div>
+      <div class="asi-mensajes" id="asi-mensajes" aria-live="polite"></div>
+      <div class="asi-sugerencias" id="asi-sugerencias"></div>
+      <div class="asi-pie">
+        <label class="chk asi-contexto"><input type="checkbox" id="asi-contexto" checked><span class="caja"></span><span>Incluir mi código y sus errores</span></label>
+        <div class="asi-entrada">
+          <textarea id="asi-texto" rows="2" placeholder="Escriba su pregunta o lo que quiere programar…" aria-label="Mensaje para el asistente"></textarea>
+          <button type="button" id="asi-enviar" title="Enviar (Ctrl+Enter)" aria-label="Enviar"><svg><use href="#i-enviar"/></svg></button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ============ Barra de estado ============ -->
+  <footer class="estado">
+    <div class="estado-izq"><span class="punto" id="est-punto"></span><span id="est-texto">Listo</span></div>
+    <div class="estado-der">
+      <span class="est-bloque">Línea: <b id="est-linea">1</b></span>
+      <span class="est-bloque">Columna: <b id="est-col">1</b></span>
+      <span class="est-bloque">Compilador v1.0</span>
+    </div>
+  </footer>
+</div>
+
+<div class="cierre" id="cierre" hidden>
+  <div><strong>El compilador se cerró.</strong><p>Ya puede cerrar esta pestaña del navegador.</p></div>
+</div>
+
+<!-- ============ Diálogos ============ -->
+<dialog id="dlg-manual" class="grande">
+  <div class="dlg-cab"><h3>Manual de uso</h3><button type="button" class="dlg-x" data-cerrar aria-label="Cerrar">&#10005;</button></div>
+  <div class="manual-cuerpo">
+    <nav class="manual-indice" id="manual-indice" aria-label="Contenido del manual"></nav>
+    <div class="manual-contenido" id="manual-contenido"><p class="dlg-nota">Cargando el manual…</p></div>
+  </div>
+</dialog>
+
+<dialog id="dlg-ejemplos">
+  <div class="dlg-cab"><h3>Ejemplos</h3><button type="button" class="dlg-x" data-cerrar aria-label="Cerrar">&#10005;</button></div>
+  <div class="dlg-cuerpo">
+    <p class="dlg-nota">Elija un programa: se abre en una pestaña nueva del editor. Los que dicen “Errores” sirven para ver cómo responde el compilador.</p>
+    <ul class="lista-ejemplos" id="lista-ejemplos"><li class="dlg-nota">Cargando…</li></ul>
+  </div>
+</dialog>
+
+<dialog id="dlg-analizador">
+  <div class="dlg-cab"><h3>Analizador</h3><button type="button" class="dlg-x" data-cerrar aria-label="Cerrar">&#10005;</button></div>
+  <div class="dlg-cuerpo">
+    <p class="dlg-nota">El compilador revisa el programa en tres fases, una después de otra. Si una fase encuentra errores, las siguientes no se ejecutan. Si todo está bien, el programa se ejecuta.</p>
+    <table class="tabla tabla-dlg">
+      <thead><tr><th>Fase</th><th>Qué comprueba</th></tr></thead>
+      <tbody>
+        <tr><td>1. Análisis léxico</td><td>Que cada palabra, número, texto y símbolo pertenezca al lenguaje. Separa el código en <em>tokens</em> (pestaña Reporte).</td></tr>
+        <tr><td>2. Análisis sintáctico</td><td>Que los tokens estén en el orden correcto: declaraciones, asignaciones, Mensaje, Captura y Si / Sino / FinSi. Construye el árbol sintáctico (pestaña Árbol Sintáctico).</td></tr>
+        <tr><td>3. Análisis semántico</td><td>Que el programa tenga sentido: variables declaradas, tipos compatibles, condiciones Verdadero/Falso. Llena la Tabla de Símbolos.</td></tr>
+        <tr><td>4. Ejecución</td><td>Corre las instrucciones y muestra los resultados en Salida del Programa. Pide los datos de Captura.</td></tr>
+      </tbody>
+    </table>
+    <h4>Tipos de token</h4>
+    <table class="tabla tabla-dlg">
+      <thead><tr><th>Tipo</th><th>Ejemplos</th></tr></thead>
+      <tbody>
+        <tr><td>PALABRA_RESERVADA</td><td>Entero Texto Real Logico Captura Mensaje Si Sino FinSi</td></tr>
+        <tr><td>VALOR_LOGICO</td><td>Verdadero Falso</td></tr>
+        <tr><td>IDENTIFICADOR</td><td>num1 nombre año_2</td></tr>
+        <tr><td>NUMERO_ENTERO / NUMERO_REAL</td><td>25 &nbsp; 3,1416</td></tr>
+        <tr><td>CADENA</td><td>"Hola" &nbsp; “Hola”</td></tr>
+        <tr><td>COMENTARIO</td><td>// nota //</td></tr>
+        <tr><td>OPERADOR_ASIGNACION</td><td>=</td></tr>
+        <tr><td>OPERADOR_RELACIONAL</td><td>== != &lt; &gt; &lt;= &gt;=</td></tr>
+        <tr><td>OPERADOR_ARITMETICO</td><td>+ - * /</td></tr>
+        <tr><td>PARENTESIS_APERTURA / CIERRE</td><td>( )</td></tr>
+        <tr><td>PUNTO_Y_COMA / PUNTO</td><td>; &nbsp; .</td></tr>
+      </tbody>
+    </table>
+    <p class="dlg-nota" style="margin-top:.8rem">Las reglas completas del lenguaje y la lista de todos los mensajes están en el <strong>Manual de uso</strong>.</p>
+  </div>
+</dialog>
+
+<dialog id="dlg-acerca" class="acerca-dlg" aria-label="Acerca de">
+  <div class="acerca-banner">
+    <button type="button" class="dlg-x acerca-x" data-cerrar aria-label="Cerrar">&#10005;</button>
+    <img class="acerca-logo" src="assets/logo_costenol_claro.png" alt="Costeñol Compilador">
+    <span class="acerca-version">Versión 1.0</span>
+  </div>
+  <div class="acerca-cuerpo">
+    <p class="acerca-lema">Compila &nbsp;&bull;&nbsp; Analiza &nbsp;&bull;&nbsp; Ejecuta</p>
+    <div class="acerca-chips" aria-label="Qué incluye">
+      <span>Análisis léxico</span><span>Análisis sintáctico</span><span>Análisis semántico</span>
+      <span>Ejecución</span><span>Exportar</span><span>Asistente IA</span>
+    </div>
+    <h4 class="acerca-titulo"><span>Equipo de desarrollo</span></h4>
+    <div class="acerca-equipo">
+      <div class="miembro">
+        <span class="avatar" aria-hidden="true">VY</span>
+        <strong>Victor Yepes</strong>
+        <small>Integrante</small>
+      </div>
+      <div class="miembro">
+        <span class="avatar" aria-hidden="true">KV</span>
+        <strong>Kenny Vivero</strong>
+        <small>Integrante</small>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlg-exportar">
+  <div class="dlg-cab"><h3>Exportar programa</h3><button type="button" class="dlg-x" data-cerrar aria-label="Cerrar">&#10005;</button></div>
+  <div class="dlg-cuerpo">
+    <p class="dlg-nota">Convierte el programa que está en el editor en un archivo que se puede ejecutar <strong>fuera del compilador</strong>. Elija en qué formato guardarlo; el navegador le preguntará en qué carpeta.</p>
+    <div class="formatos" id="lista-formatos" role="radiogroup" aria-label="Formato de exportación"><p class="dlg-nota">Cargando formatos…</p></div>
+    <label class="campo">Nombre del archivo
+      <input type="text" id="exp-nombre" class="campo-texto" autocomplete="off" spellcheck="false">
+    </label>
+    <p class="exp-estado" id="exp-estado" role="status"></p>
+    <div class="dlg-botones">
+      <button type="button" class="btn-pequeno" data-cerrar>Cerrar</button>
+      <button type="button" class="btn-pequeno azul" id="exp-guardar">Exportar…</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlg-config">
+  <div class="dlg-cab"><h3>Configuración</h3><button type="button" class="dlg-x" data-cerrar aria-label="Cerrar">&#10005;</button></div>
+  <div class="dlg-cuerpo">
+    <label class="campo">Tamaño de la letra del editor: <strong id="val-tam">100 %</strong>
+      <input type="range" id="rng-tam" min="80" max="150" step="5" value="100">
+    </label>
+    <label class="chk chk-dlg"><input type="checkbox" id="chk-costeno" checked><span class="caja"></span><span>Mensajes de error en costeño (si lo desmarca, salen en español formal)</span></label>
+    <label class="chk chk-dlg"><input type="checkbox" id="chk-autocompletar" checked><span class="caja"></span><span>Autocompletado: sugerir comandos mientras escribo (Tab para completar)</span></label>
+    <label class="chk chk-dlg"><input type="checkbox" id="chk-autoanalisis"><span class="caja"></span><span>Compilar automáticamente al dejar de escribir</span></label>
+    <label class="chk chk-dlg"><input type="checkbox" id="chk-reporte"><span class="caja"></span><span>Descargar un archivo de reporte (reporte.txt) cada vez que se compile</span></label>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

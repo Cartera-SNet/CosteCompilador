@@ -1,0 +1,6 @@
+// Ejemplo: Errores con nombres de variables //
+entero Entero;
+Texto texto;
+si Entero;
+mensaje Texto;
+miEntero Entero;

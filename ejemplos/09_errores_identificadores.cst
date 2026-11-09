@@ -1,0 +1,8 @@
+// Ejemplo: Errores léxicos en identificadores y palabras reservadas //
+_x Entero;
+edád Entero;
+Lógico activo;
+nombre_demasiado_largo_para_ser_valido Texto;
+si (a > 1)
+FINSI
+entero b;

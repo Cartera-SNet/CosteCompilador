@@ -1,0 +1,2 @@
+// Ejemplo: Hola Mundo //
+Mensaje.Texto("Hola Mundo");

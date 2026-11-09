@@ -1,0 +1,413 @@
+<!--
+  MANUAL DE USO DEL COMPILADOR COSTEÑOL
+  ======================================
+  IMPORTANTE PARA QUIEN MODIFIQUE EL PROYECTO:
+  Cada vez que cambie el lenguaje, una regla o la pantalla, actualice este manual.
+  Cuando se publique una versión nueva, agregue una fila en "Historial de cambios" (al final)
+  y suba el número de versión (hoy es la 1.0).
+    * El "Catálogo de mensajes" se llena solo desde los archivos Python: solo hay
+      que mantener los textos del CATALOGO de cada módulo.
+    * Los ejemplos de código (pre con class "codigo") se revisan automáticamente con
+      pruebas_compilador.py: los marcados con data-error deben fallar y los demás
+      deben compilar sin errores.
+-->
+
+<div class="portada">
+  <h1>Manual de uso de MiCompilador</h1>
+  <p>Cómo escribir programas en Costeñol, ejecutarlos y entender lo que dice el compilador.</p>
+</div>
+<div class="indice-rapido">
+  <a href="#empezar">Empezar</a>
+  <a href="#reglas">Reglas de Costeñol</a>
+  <a href="#ejemplos-man">Ejemplos</a>
+  <a href="#pantalla">La pantalla</a>
+  <a href="#exportar-man">Exportar</a>
+  <a href="#asistente-man">Asistente de IA</a>
+  <a href="#errores-man">Errores</a>
+  <a href="#faq">Preguntas frecuentes</a>
+</div>
+
+<h2 id="empezar">1. Empezar en 3 pasos</h2>
+<div class="pasos">
+  <div class="paso"><b class="n">1</b><strong>Escriba</strong><p>En el editor (zona blanca de la izquierda) escriba su programa, o ábralo desde <em>Ejemplos</em>.</p></div>
+  <div class="paso"><b class="n">2</b><strong>Ejecute</strong><p>Presione el botón verde <strong>Ejecutar</strong> (o <kbd>F5</kbd>).</p></div>
+  <div class="paso"><b class="n">3</b><strong>Mire la salida</strong><p>El resultado aparece en la pantalla negra. Si hay errores, el compilador dice cuáles son y en qué línea.</p></div>
+</div>
+<p>Pruebe con este programa (botón <em>Probar en el editor</em>):</p>
+<pre class="codigo">
+// Mi primer programa //
+Mensaje.Texto("Hola Mundo");
+</pre>
+<pre class="salida-ej">Hola Mundo
+
+Proceso finalizado correctamente.</pre>
+
+<h3>Compilar o Ejecutar</h3>
+<ul>
+  <li><strong>Ejecutar</strong> (<kbd>F5</kbd>): revisa el programa y, si no tiene errores, lo corre. Es el botón que más va a usar.</li>
+  <li><strong>Compilar</strong> (<kbd>F7</kbd>): solo revisa el programa y muestra los errores, sin correrlo.</li>
+</ul>
+
+<h3>Cuando el programa pide un dato</h3>
+<p>Si el programa usa <code>Captura</code>, en la pantalla negra aparece una casilla para escribir. Escriba el valor y presione <kbd>Enter</kbd>. Si el valor no sirve (por ejemplo letras donde va un número), se lo avisa y se lo vuelve a pedir. Con <kbd>Esc</kbd> detiene el programa.</p>
+
+<h2 id="reglas">2. Reglas de Costeñol</h2>
+<p>Costeñol es un lenguaje con instrucciones en español. Estas son todas sus reglas; si un programa no las cumple, el compilador lo avisa.</p>
+
+<h3>Resumen de instrucciones</h3>
+<table>
+  <thead><tr><th>Quiero…</th><th>Se escribe</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Crear una variable</td><td><code>nombre Tipo;</code></td><td><code>edad Entero;</code></td></tr>
+    <tr><td>Guardar un valor</td><td><code>nombre = valor;</code></td><td><code>edad = 20;</code></td></tr>
+    <tr><td>Pedir un dato al usuario</td><td><code>nombre = Captura.Tipo();</code></td><td><code>edad = Captura.Entero();</code></td></tr>
+    <tr><td>Mostrar algo</td><td><code>Mensaje.Texto(valor);</code></td><td><code>Mensaje.Texto("Hola");</code></td></tr>
+    <tr><td>Decidir</td><td><code>Si (condición)</code> … <code>Sino</code> … <code>FinSi</code></td><td><code>Si (edad >= 18)</code></td></tr>
+    <tr><td>Escribir una nota</td><td><code>// nota //</code></td><td><code>// calcula la edad //</code></td></tr>
+  </tbody>
+</table>
+
+<div class="grupo-reglas">
+  <h3>A. Cómo se escribe</h3>
+  <ul>
+    <li><strong>Las mayúsculas y minúsculas importan.</strong> Las palabras reservadas se escriben exactamente así y sin tilde: <code>Entero</code> <code>Texto</code> <code>Real</code> <code>Logico</code> <code>Captura</code> <code>Mensaje</code> <code>Si</code> <code>Sino</code> <code>FinSi</code> <code>Verdadero</code> <code>Falso</code>.</li>
+    <li>Cada instrucción (declarar, asignar, leer, mostrar) <strong>termina con punto y coma</strong> <code>;</code>. Las líneas <code>Si (…)</code>, <code>Sino</code> y <code>FinSi</code> no lo llevan.</li>
+    <li>Los textos van entre <strong>comillas dobles</strong> y deben empezar y terminar en la misma línea.</li>
+    <li>Los <strong>comentarios</strong> van entre dos <code>//</code> y también en una sola línea. El compilador los ignora.</li>
+    <li>Las líneas en blanco y los espacios no cambian nada: úselos para ordenar. Se pueden escribir varias instrucciones en la misma línea.</li>
+  </ul>
+  <div class="si-no"><div class="bien">a1 Entero;</div><div class="mal-ej">a1 entero;</div></div>
+</div>
+
+<div class="grupo-reglas">
+  <h3>B. Variables y tipos</h3>
+  <ul>
+    <li>Hay cuatro tipos: <code>Entero</code> (números sin decimales, de -2147483647 a 2147483647), <code>Real</code> (con decimales), <code>Texto</code> (palabras y frases) y <code>Logico</code> (solo <code>Verdadero</code> o <code>Falso</code>).</li>
+    <li>Toda variable se <strong>declara antes de usarla</strong>, una sola vez, y <strong>fuera de los <code>Si</code></strong> (lo mejor es al inicio del programa).</li>
+    <li>El nombre empieza con una letra; después puede tener letras sin tilde (la ñ sí), números y guion bajo. Máximo 30 caracteres. <code>edad</code> y <code>Edad</code> son variables distintas.</li>
+    <li><strong>Una variable no puede llamarse como un tipo de dato ni como una palabra reservada</strong>, ni siquiera cambiando las mayúsculas: <code>entero Entero;</code> es un error. Sí se puede usar un nombre que <em>contenga</em> la palabra, como <code>miEntero</code> o <code>enteros</code>.</li>
+    <li>Una variable solo guarda valores de su tipo. La única conversión automática es guardar un <code>Entero</code> en una variable <code>Real</code>.</li>
+    <li>Una variable debe tener un valor (asignado o leído con <code>Captura</code>) antes de usarse.</li>
+    <li>Los <strong>decimales llevan coma</strong>.</li>
+  </ul>
+  <div class="si-no"><div class="bien">pi = 3,1416;</div><div class="mal-ej">pi = 3.1416;</div></div>
+  <div class="si-no"><div class="bien">miEntero Entero;</div><div class="mal-ej">entero Entero;</div></div>
+</div>
+
+<div class="grupo-reglas">
+  <h3>C. Leer y mostrar</h3>
+  <ul>
+    <li><code>Captura.Tipo()</code> pide un dato al usuario. <em>Tipo</em> es <code>Texto</code>, <code>Entero</code>, <code>Real</code> o <code>Logico</code> y debe ser el de la variable que lo recibe. Se usa <strong>solo</strong> así: <code>variable = Captura.Tipo();</code>, sin mezclarlo con operaciones.</li>
+    <li>El compilador <strong>no muestra ningún texto por sí solo</strong> al pedir un dato: avise qué debe escribir el usuario con un <code>Mensaje.Texto</code> justo antes de <code>Captura</code>.</li>
+    <li><code>Mensaje.Texto( … );</code> muestra un texto, un número, una variable o una operación, y baja de línea. <code>Mensaje.Texto("");</code> deja una línea en blanco.</li>
+    <li>Con <code>+</code> se unen textos. Si un lado es <code>Texto</code>, el otro se convierte a texto: <code>"Tu edad es: " + edad</code>.</li>
+    <li>Al ejecutar, un <code>Entero</code> se escribe sin decimales, un <code>Real</code> con coma, un <code>Logico</code> como <code>Verdadero</code> o <code>Falso</code>, y un <code>Texto</code> puede ser cualquier cosa.</li>
+  </ul>
+</div>
+
+<div class="grupo-reglas">
+  <h3>D. Operaciones y comparaciones</h3>
+  <ul>
+    <li>Orden de las operaciones, como en matemáticas: primero los paréntesis, luego <code>*</code> y <code>/</code>, y al final <code>+</code> y <code>-</code>. Así <code>2 + 3 * 4</code> da 14 y <code>(2 + 3) * 4</code> da 20.</li>
+    <li>Entero con Entero da Entero; si hay un Real, el resultado es Real.</li>
+    <li>La división <code>/</code> <strong>siempre da un Real</strong>, así que se guarda en una variable <code>Real</code>. Dividir por cero es un error.</li>
+    <li>Las comparaciones dan <code>Verdadero</code> o <code>Falso</code> y se pueden guardar en una variable <code>Logico</code>.</li>
+    <li><strong>Entre dos valores siempre va un operador.</strong> Un paréntesis no puede ir pegado a un número ni a otro valor, y todo <code>(</code> debe cerrarse con su <code>)</code>.</li>
+  </ul>
+  <table>
+    <thead><tr><th>Símbolo</th><th>Significa</th><th>Se puede usar con</th></tr></thead>
+    <tbody>
+      <tr><td><code>+</code> &nbsp; <code>-</code> &nbsp; <code>*</code> &nbsp; <code>/</code></td><td>Sumar, restar, multiplicar, dividir</td><td>Números (el <code>+</code> también une textos)</td></tr>
+      <tr><td><code>==</code> &nbsp; <code>!=</code></td><td>Igual a, distinto de</td><td>Números, textos o lógicos (del mismo tipo)</td></tr>
+      <tr><td><code>&lt;</code> &nbsp; <code>&gt;</code> &nbsp; <code>&lt;=</code> &nbsp; <code>&gt;=</code></td><td>Menor, mayor, menor o igual, mayor o igual</td><td>Solo números</td></tr>
+    </tbody>
+  </table>
+  <div class="si-no"><div class="bien">n = 2 * (3 + 4);</div><div class="mal-ej">n = 2(3 + 4);</div></div>
+  <div class="ojo" style="margin:0.5rem 1rem 0.8rem"><strong>Un solo <code>=</code> guarda un valor; dos <code>==</code> comparan.</strong> Dentro de un <code>Si</code> hay que usar <code>==</code>.</div>
+</div>
+
+<div class="grupo-reglas">
+  <h3>E. Condicionales: Si, Sino, FinSi</h3>
+  <ul>
+    <li>Se escribe <code>Si</code>, <strong>un espacio</strong> y la condición <strong>entre paréntesis</strong>: <code>Si (edad >= 18)</code>.</li>
+    <li>La condición debe dar <code>Verdadero</code> o <code>Falso</code>: una comparación, o una variable <code>Logico</code>.</li>
+    <li><code>Sino</code> es opcional y solo puede haber uno por cada <code>Si</code>.</li>
+    <li>Todo <code>Si</code> termina con <code>FinSi</code>.</li>
+    <li><code>Sino</code> y <code>FinSi</code> se escriben <strong>solos en su línea</strong> (después solo puede ir un comentario).</li>
+    <li>Entre ellos van las instrucciones (puede no haber ninguna). Un <code>Si</code> puede ir dentro de otro.</li>
+  </ul>
+  <div class="si-no"><div class="bien">Si (edad >= 18)</div><div class="mal-ej">Si(edad >= 18)</div></div>
+</div>
+
+<div class="grupo-reglas">
+  <h3>F. Lo que Costeñol todavía no tiene</h3>
+  <ul>
+    <li>Ciclos (repetir), listas, funciones propias.</li>
+    <li>Los operadores lógicos y, o, no; el módulo (%); números aleatorios y fechas.</li>
+    <li>Comentarios de varias líneas.</li>
+  </ul>
+</div>
+
+<div class="grupo-reglas">
+  <h3>G. Límites</h3>
+  <ul>
+    <li>Si un cálculo se sale del rango de los enteros (±2147483647), el programa se detiene con un error.</li>
+    <li>Una instrucción admite hasta 150 operaciones y hasta 40 niveles de paréntesis o de <code>Si</code> dentro de <code>Si</code>.</li>
+    <li>Un programa puede tener hasta 2 000 000 de caracteres. El compilador muestra como máximo 200 errores por fase.</li>
+  </ul>
+</div>
+
+<h2 id="ejemplos-man">3. Aprender con ejemplos</h2>
+
+<h3>Variables y operaciones</h3>
+<pre class="codigo">
+num1 Entero;
+num2 Entero;
+num3 Entero;
+suma Entero;
+
+num1 = 2;
+num2 = 3;
+num3 = 4;
+suma = num1 + (num2 * num3);
+Mensaje.Texto(suma);
+</pre>
+<pre class="salida-ej">14</pre>
+
+<h3>Mostrar textos, números y variables</h3>
+<pre class="codigo">
+nombre Texto;
+total Entero;
+nombre = "Alejandra";
+total = 5 * 4;
+
+Mensaje.Texto("Esto es una prueba");
+Mensaje.Texto("");
+Mensaje.Texto(nombre);
+Mensaje.Texto("El total es " + total);
+</pre>
+<pre class="salida-ej">Esto es una prueba
+
+Alejandra
+El total es 20</pre>
+
+<h3>Calcular con decimales</h3>
+<pre class="codigo">
+nota1 Real;
+nota2 Real;
+promedio Real;
+
+nota1 = 4,5;
+nota2 = 3,5;
+promedio = (nota1 + nota2) / 2;
+Mensaje.Texto("Promedio: " + promedio);
+</pre>
+<pre class="salida-ej">Promedio: 4,0</pre>
+
+<h3>Una comparación guardada en una variable</h3>
+<pre class="codigo">
+edad Entero;
+mayor Logico;
+edad = 20;
+mayor = edad >= 18;
+Mensaje.Texto(mayor);
+</pre>
+<pre class="salida-ej">Verdadero</pre>
+
+<h3>Tomar decisiones</h3>
+<pre class="codigo">
+edad Entero;
+Mensaje.Texto("Ingrese su edad:");
+edad = Captura.Entero();
+
+Si (edad >= 18)
+    Mensaje.Texto("Mayor de edad");
+Sino
+    Mensaje.Texto("Menor de edad");
+FinSi
+</pre>
+
+<h3>Condicionales dentro de condicionales</h3>
+<pre class="codigo">
+nota Real;
+Mensaje.Texto("Ingrese la nota (con coma, por ejemplo 3,5):");
+nota = Captura.Real();
+
+Si (nota >= 3,0)
+    Si (nota >= 4,5)
+        Mensaje.Texto("Excelente");
+    Sino
+        Mensaje.Texto("Aprobado");
+    FinSi
+Sino
+    Mensaje.Texto("Reprobado");
+FinSi
+</pre>
+
+<h3>Un programa completo: calcular la edad</h3>
+<pre class="codigo">
+// Programa: Calcular edad a partir del año de nacimiento //
+anioNacimiento Entero;
+anioActual Entero;
+edad Entero;
+
+anioActual = 2026;
+
+Mensaje.Texto("Ingrese su año de nacimiento:");
+anioNacimiento = Captura.Entero();
+
+edad = anioActual - anioNacimiento;
+
+Mensaje.Texto("Tu edad es: " + edad + " años");
+</pre>
+<div class="nota">Observe que el nombre es <code>anioNacimiento</code> y no <code>añoNacimiento</code>: los nombres de variable no llevan tilde. Los textos entre comillas sí pueden llevar tildes y ñ.</div>
+
+<h2 id="pantalla">4. La pantalla del compilador</h2>
+<table>
+  <thead><tr><th>Parte</th><th>Para qué sirve</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Barra lateral</strong></td><td><em>Inicio</em> vuelve al editor. <em>Ejemplos</em> abre programas de muestra. <em>Analizador</em> explica las fases. <em>Asistente IA</em> abre el asistente. <em>Manual de uso</em> es esta guía. <em>Acerca de</em> muestra los datos del proyecto.</td></tr>
+    <tr><td><strong>Nuevo / Abrir / Guardar</strong></td><td>Pestaña en blanco, cargar un archivo .cst o .txt, y descargar el programa como archivo .cst.</td></tr>
+    <tr><td><strong>Compilar / Ejecutar</strong></td><td>Revisar el programa / revisarlo y correrlo.</td></tr>
+    <tr><td><strong>Exportar</strong></td><td>Convierte el programa en un archivo (.py, .js, .html, .jar…) que se ejecuta fuera del compilador. Ver la sección «Exportar el programa».</td></tr>
+    <tr><td><strong>Editor</strong></td><td>Donde se escribe. Colorea las palabras reservadas (azul), los textos (rojo) y los comentarios (verde). Marca en rojo las líneas con error y en naranja las que tienen advertencia. El <strong>+</strong> abre una pestaña nueva y la <strong>✕</strong> la cierra; sus pestañas se guardan solas en este navegador. El botón <strong>Limpiar código</strong> (arriba a la derecha del editor) borra todo lo escrito en la pestaña; con <kbd>Ctrl</kbd>+<kbd>Z</kbd> se recupera.</td></tr>
+    <tr><td><strong>Salida del Programa</strong></td><td>Pantalla negra con lo que muestra el programa, la casilla para los datos de <code>Captura</code> y los errores de ejecución. <em>Limpiar</em> borra lo que se ve.</td></tr>
+    <tr><td><strong>Mensajes</strong></td><td>Resumen de las fases y enlaces a los demás resultados.</td></tr>
+    <tr><td><strong>Errores</strong></td><td>Cada error con línea, columna y explicación. Haga clic en uno para ir a esa línea.</td></tr>
+    <tr><td><strong>Advertencias</strong></td><td>Avisos que no impiden ejecutar (por ejemplo, una variable que nunca se usa).</td></tr>
+    <tr><td><strong>Reporte</strong></td><td>Los <em>tokens</em>: las piezas en que el compilador separa el programa (línea, columna, tipo y valor).</td></tr>
+    <tr><td><strong>Árbol Sintáctico</strong></td><td>Dibujo de la estructura del programa.</td></tr>
+    <tr><td><strong>Tabla de Símbolos</strong></td><td>Las variables: nombre, tipo, línea donde se declaran y si se les da valor y se usan.</td></tr>
+    <tr><td><strong>Barra de estado</strong></td><td>Qué está haciendo el compilador y la línea y columna del cursor.</td></tr>
+  </tbody>
+</table>
+<h3>Autocompletado</h3>
+<p>Mientras escribe en el editor, el compilador le <strong>sugiere cómo seguir</strong>: aparece el resto de la palabra en gris y, si hay varias opciones, una lista. Presione <kbd>Tab</kbd> para completar.</p>
+<table>
+  <thead><tr><th>Si escribe…</th><th>Sugiere</th><th>Con Tab queda</th></tr></thead>
+  <tbody>
+    <tr><td><code>Mens</code></td><td>Mensaje.Texto</td><td><code>Mensaje.Texto("");</code> con el cursor entre las comillas</td></tr>
+    <tr><td><code>Ca</code></td><td>Captura.Entero, Real, Texto o Logico</td><td><code>Captura.Entero();</code></td></tr>
+    <tr><td><code>Si</code></td><td>El condicional completo</td><td><code>Si ()</code>, una línea con sangría y <code>FinSi</code>, con el cursor dentro del paréntesis</td></tr>
+    <tr><td><code>Sin</code> / <code>Fin</code></td><td>Sino / FinSi</td><td>La palabra completa</td></tr>
+    <tr><td><code>edad En</code> (tras el nombre de una variable)</td><td>El tipo de dato</td><td><code>edad Entero;</code></td></tr>
+    <tr><td>Las primeras letras de una variable ya declarada</td><td>Esa variable</td><td>El nombre completo</td></tr>
+  </tbody>
+</table>
+<p>No sugiere dentro de textos entre comillas ni dentro de comentarios. Con <kbd>↑</kbd> y <kbd>↓</kbd> elige otra opción de la lista, con <kbd>Esc</kbd> la cierra, y también puede hacer clic en una opción. Si no hay sugerencia, <kbd>Tab</kbd> escribe 4 espacios como siempre. Se puede desactivar en <em>Configuración</em>.</p>
+<h3>Atajos de teclado</h3>
+<table>
+  <thead><tr><th>Tecla</th><th>Acción</th></tr></thead>
+  <tbody>
+    <tr><td><kbd>F5</kbd> o <kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Ejecutar</td></tr>
+    <tr><td><kbd>F7</kbd></td><td>Compilar (solo revisar)</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Guardar el programa como archivo</td></tr>
+    <tr><td><kbd>Tab</kbd></td><td>Completa la sugerencia del autocompletado; si no hay ninguna, escribe 4 espacios</td></tr>
+    <tr><td><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Esc</kbd> (con sugerencias)</td><td>Elegir otra sugerencia / cerrarlas</td></tr>
+    <tr><td><kbd>Enter</kbd> / <kbd>Esc</kbd> (en la salida)</td><td>Enviar el dato pedido / detener el programa</td></tr>
+  </tbody>
+</table>
+
+<h2 id="exportar-man">5. Exportar el programa</h2>
+<p>El botón <strong>Exportar</strong> convierte el programa del editor en un archivo que funciona <strong>por sí solo</strong>, sin el compilador. El programa exportado hace lo mismo que cuando lo ejecuta aquí: los mismos resultados, los mismos errores y pide los datos de la misma manera.</p>
+<h3>Cómo exportar</h3>
+<ol>
+  <li>Presione <strong>Exportar</strong> en la barra de botones.</li>
+  <li>Elija el formato y, si quiere, cambie el nombre del archivo.</li>
+  <li>Presione <strong>Exportar…</strong>: el navegador le pregunta <strong>en qué carpeta</strong> guardarlo (en Chrome y Edge; en otros navegadores el archivo queda en la carpeta de descargas).</li>
+</ol>
+<div class="ojo">Solo se puede exportar un programa <strong>sin errores</strong>. Si tiene errores, la ventana lo avisa y ofrece mostrarlos.</div>
+<h3>Formatos</h3>
+<table>
+  <thead><tr><th>Formato</th><th>Qué necesita quien lo ejecute</th><th>Cómo se ejecuta</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Python</strong> (<code>.py</code>)</td><td>Python 3.8 o superior</td><td><code>python programa.py</code></td></tr>
+    <tr><td><strong>JavaScript</strong> (<code>.js</code>)</td><td>Node.js</td><td><code>node programa.js</code></td></tr>
+    <tr><td><strong>Página web</strong> (<code>.html</code>)</td><td>Solo un navegador</td><td>Doble clic en el archivo</td></tr>
+    <tr><td><strong>Java ejecutable</strong> (<code>.jar</code>)</td><td>Java (para ejecutarlo)</td><td><code>java -jar programa.jar</code></td></tr>
+    <tr><td><strong>Java código fuente</strong> (<code>Programa.java</code>)</td><td>Un JDK (para compilarlo)</td><td><code>javac Programa.java</code> y luego <code>java Programa</code></td></tr>
+  </tbody>
+</table>
+<div class="nota">Para <strong>construir</strong> el <code>.jar</code>, este computador debe tener instalado un JDK de Java (los programas <code>javac</code> y <code>jar</code>). Si no lo tiene, esa opción aparece desactivada: exporte «Java código fuente» y compílelo en un computador que sí lo tenga.</div>
+<div class="nota">En Windows, si un programa de Java muestra símbolos raros en lugar de las tildes, escriba <code>chcp 65001</code> en la consola antes de ejecutarlo.</div>
+
+<h2 id="asistente-man">6. Asistente de IA</h2>
+<p>El asistente (botón <strong>Asistente IA</strong> de la barra lateral) escribe programas en Costeñol y responde preguntas sobre el lenguaje y el compilador. Se abre a la derecha, sin tapar el editor.</p>
+<h3>Qué le puede pedir</h3>
+<ul>
+  <li><em>«Quiero calcular la edad de una persona con su año de nacimiento»</em>: le entrega el programa completo.</li>
+  <li><em>«¿Cómo se declaran los enteros?»</em>: le explica la regla con un ejemplo.</li>
+  <li><em>«Revisa mi código y dime qué falla»</em>: con la casilla <strong>Incluir mi código y sus errores</strong> marcada, el asistente ve lo que hay en el editor y los errores del compilador.</li>
+</ul>
+<h3>Qué hace con el código</h3>
+<ul>
+  <li>Todo el código que le entrega <strong>se compila con el compilador real</strong>. Si tiene errores, el asistente lo corrige solo (hasta 2 veces) antes de mostrárselo.</li>
+  <li>Cada bloque de código dice si <em>compila sin errores</em> y tiene tres botones: <em>Copiar</em>, <em>Abrir en el editor</em> (en una pestaña nueva) y <em>Abrir y ejecutar</em>.</li>
+</ul>
+<h3>Cómo conectarlo (solo la primera vez)</h3>
+<ol>
+  <li>Cree una clave de API en <em>console.anthropic.com</em> (menú API Keys).</li>
+  <li>En el asistente, pulse el engranaje, pegue la clave y presione <strong>Guardar</strong>.</li>
+</ol>
+<div class="nota">La clave se guarda solo en su computador (archivo <code>ia_config.json</code> junto al programa) y solo se envía a Anthropic. El uso de la API se cobra por consumo, aparte de cualquier suscripción de Claude. No comparta ese archivo ni lo incluya cuando entregue el proyecto.</div>
+<div class="ojo">Cuando usa el asistente, su pregunta (y su código, si la casilla está marcada) se envía por internet a Anthropic para generar la respuesta. El compilador, en cambio, funciona sin internet.</div>
+
+<h2 id="errores-man">7. Errores y advertencias</h2>
+<p>El compilador revisa el programa en <strong>tres fases</strong>, una después de otra. Si una fase encuentra errores, las siguientes no se ejecutan: primero hay que corregirlos.</p>
+<ol>
+  <li><strong>Análisis léxico:</strong> que cada palabra, número, texto y símbolo exista en el lenguaje (por ejemplo, <code>3.14</code> con punto, o un símbolo como <code>@</code>).</li>
+  <li><strong>Análisis sintáctico:</strong> que todo esté en el orden correcto (por ejemplo, falta un <code>;</code> o un <code>FinSi</code>).</li>
+  <li><strong>Análisis semántico:</strong> que el programa tenga sentido (por ejemplo, usar una variable sin declarar o guardar un texto en un <code>Entero</code>).</li>
+</ol>
+<p>Si pasa las tres, se ejecuta. Aun así pueden ocurrir <em>errores de ejecución</em>, como dividir por cero cuando el divisor lo escribe el usuario.</p>
+<h3>Los errores hablan en costeño</h3>
+<p>Costeñol se llama así porque el compilador habla como costeño. Cada error y cada advertencia dice <strong>la línea</strong>, <strong>el tipo de error</strong> y <strong>la causa</strong>, con este formato:</p>
+<div class="nota"><code>&lt;saludo&gt; en la línea N. Error &lt;tipo&gt;: &lt;causa&gt;.</code><br>Tipos: <em>léxico</em> (palabras o símbolos que no existen), <em>sintáctico</em> (orden incorrecto), <em>semántico</em> (no tiene sentido, por ejemplo una variable sin declarar) y <em>de ejecución</em> (falla al correr, por ejemplo dividir por cero).</div>
+<p>Si prefiere el mensaje en español formal, en <em>Configuración</em> desmarque «Mensajes de error en costeño». Al dejar el mouse sobre un error se ve además el detalle técnico, y el código (por ejemplo <code>E-SEM-01</code>) sirve para buscarlo en el catálogo.</p>
+<h3>Ejemplo de un error</h3>
+<pre class="codigo" data-error>
+edad Entero
+edad = 20;
+Mensaje.Texto(edad);
+</pre>
+<div class="error-ej"><strong>Mira, mi llave, en la línea 1 hay un enredo. Error sintáctico: te faltó el punto y coma al final de la instrucción.</strong> (columna 12) &mdash; <code>E-SIN-01</code></div>
+<p>La línea indica dónde corregir y el código (<code>E-SIN-01</code>) se busca en el catálogo de abajo para ver cómo solucionarlo.</p>
+<div class="nota">Una sola equivocación a veces causa varios avisos. Corrija <strong>siempre el primer error de la lista</strong> y vuelva a compilar: muchos de los demás desaparecen solos.</div>
+
+<h3>Catálogo de mensajes</h3>
+<p>Todos los errores y advertencias que puede mostrar el compilador, con su significado y cómo corregirlos. Busque por código (por ejemplo <code>E-SIN-01</code>) o por una palabra.</p>
+<div id="catalogo-mensajes"><p class="dlg-nota">Cargando…</p></div>
+
+<h2 id="faq">8. Preguntas frecuentes</h2>
+<h3>Me dice que falta el punto y coma y sí lo escribí.</h3>
+<p>Revise la línea <strong>anterior</strong> a la que marca el error: casi siempre es esa la que no termina en <code>;</code>.</p>
+<h3>Me sale un error con <code>entero</code>, <code>si</code> o <code>mensaje</code>.</h3>
+<p>Las mayúsculas importan: se escribe <code>Entero</code>, <code>Si</code>, <code>Mensaje</code>. Por ejemplo <code>a1 entero;</code> es un error y <code>a1 Entero;</code> es correcto. El mensaje de error le sugiere la palabra correcta.</p>
+<h3>¿Por qué no puedo guardar <code>10 / 2</code> en un Entero?</h3>
+<p>Porque la división siempre da un <code>Real</code>, y un Real no cabe en un Entero. Declare la variable como <code>Real</code>.</p>
+<h3>¿Cómo muestro un texto junto con un número?</h3>
+<p>Únalos con <code>+</code>: <code>Mensaje.Texto("Edad: " + edad);</code></p>
+<h3>El programa se quedó esperando.</h3>
+<p>Probablemente pide un dato con <code>Captura</code>. Escriba el valor en la casilla de la pantalla negra y presione <kbd>Enter</kbd>, o presione <kbd>Esc</kbd> para detenerlo.</p>
+<h3>¿Dónde veo los tokens, el árbol y las variables?</h3>
+<p>En las pestañas de abajo: <strong>Reporte</strong> (tokens), <strong>Árbol Sintáctico</strong> y <strong>Tabla de Símbolos</strong>. Los tokens aparecen aunque haya errores de sintaxis; el árbol y las variables, solo cuando no hay errores léxicos ni de sintaxis.</p>
+<h3>No quiero que el editor sugiera cosas.</h3>
+<p>Abra <strong>Configuración</strong> y desmarque «Autocompletado».</p>
+<h3>Me dice que el nombre de la variable no es válido.</h3>
+<p>Una variable no puede llamarse como un tipo de dato ni como una palabra reservada, ni cambiando mayúsculas o minúsculas: <code>entero Entero;</code> es un error. Use otro nombre, por ejemplo <code>miEntero Entero;</code>.</p>
+<h3>¿Por qué los errores hablan así?</h3>
+<p>Es parte del lenguaje: Costeñol habla en costeño. Puede cambiarlo a español formal en <em>Configuración</em>.</p>
+<h3>¿Cómo ejecuto mi programa fuera del compilador?</h3>
+<p>Con el botón <strong>Exportar</strong>: elija Python, JavaScript, página web o Java, y el archivo se ejecuta solo (sección 5).</p>
+<h3>Cerré la ventana y se perdió mi programa.</h3>
+<p>El compilador guarda sus pestañas en este navegador, así que al volver a abrirlo deberían estar. Para conservarlas siempre use el botón <strong>Guardar</strong>.</p>
+<h3>¿Cómo cierro el compilador?</h3>
+<p>Con la <strong>✕</strong> de la esquina superior derecha de la ventana del compilador. El programa de fondo se cierra solo.</p>
+
+<h2 id="historial">9. Historial de cambios</h2>
+<table>
+  <thead><tr><th>Versión</th><th>Qué incluye</th></tr></thead>
+  <tbody>
+    <tr><td>1.0</td><td>Primera versión del compilador de Costeñol: editor con pestañas y autocompletado; análisis léxico, sintáctico y semántico; ejecución con lectura de datos; errores y advertencias en costeño (o en español formal); árbol sintáctico, tabla de símbolos y reporte de tokens; exportar a Python, JavaScript, página web y Java; asistente de IA; este manual; y funcionamiento en el computador (.bat o .exe) y en línea.</td></tr>
+  </tbody>
+</table>

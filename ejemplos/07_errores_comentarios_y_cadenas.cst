@@ -1,0 +1,7 @@
+// Ejemplo: Errores léxicos en comentarios y cadenas //
+// este comentario no se cierra
+saludo Texto;
+saludo = "texto sin cerrar;
+otro = 'comillas simples';
+mezcla = "abierta con recta y cerrada con curva”;
+fin Entero; // este sí está bien //
