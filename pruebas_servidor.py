@@ -126,6 +126,31 @@ class Servidor(unittest.TestCase):
         self.assertEqual(pedir(self.base, "/api/detener", {"sesion": sid})[0], 200)
         self.assertEqual(pedir(self.base, "/api/entrada", {"sesion": sid, "valor": "x"})[0], 404)
 
+    def test_archivos_para_el_celular(self):
+        estado, cab, html = pedir_crudo(self.base, "/")
+        self.assertEqual(estado, 200)
+        self.assertIn("viewport-fit=cover", html)
+        self.assertIn("interactive-widget=resizes-content", html)
+        self.assertIn('src="movil.js"', html)
+        self.assertIn('id="barra-movil"', html)
+        self.assertIn('id="btn-menu"', html)
+        self.assertIn('rel="manifest"', html)
+        estado, cab, js = pedir_crudo(self.base, "/movil.js")
+        self.assertEqual(estado, 200)
+        self.assertIn("javascript", cab.get("Content-Type", ""))
+        self.assertIn("classList.toggle('movil'", js)
+        estado, cab, texto = pedir_crudo(self.base, "/manifest.webmanifest")
+        self.assertEqual(estado, 200)
+        self.assertIn("manifest+json", cab.get("Content-Type", ""))
+        manifiesto = json.loads(texto)
+        self.assertEqual(manifiesto["display"], "standalone")
+        for icono in manifiesto["icons"]:
+            self.assertEqual(pedir_crudo(self.base, "/" + icono["src"])[0], 200)
+        self.assertEqual(pedir_crudo(self.base, "/assets/icono-180.png")[0], 200)
+        css = pedir_crudo(self.base, "/estilos.css")[2]
+        for regla in ("MODO RESPONSIVE", "html.movil .principal", ".barra-movil", "html.movil #asistente"):
+            self.assertIn(regla, css)
+
     def test_json_bomba_no_tumba_el_servidor(self):
         for ruta in ("/api/analizar", "/api/ejecutar", "/api/asistente", "/api/exportar"):
             self.assertEqual(pedir(self.base, ruta, b"[" * 200000)[0], 400, ruta)
@@ -217,6 +242,15 @@ class Servidor(unittest.TestCase):
         self.assertEqual(estado, 400)
         estado, r = pedir(self.base, "/api/ia/config", {"clave": 5})
         self.assertEqual(estado, 400)
+
+
+def pedir_crudo(base, ruta):
+    """GET que devuelve (estado, cabeceras, texto) sin interpretar JSON."""
+    try:
+        with urllib.request.urlopen(base + ruta, timeout=20) as r:
+            return r.status, dict(r.headers), r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        return e.code, dict(e.headers), ""
 
 
 def pedir_con(base, ruta, cuerpo=None, cabeceras=None):

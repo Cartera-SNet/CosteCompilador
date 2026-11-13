@@ -39,7 +39,7 @@ Costeñol es un lenguaje de programación educativo con instrucciones en españo
 | `costenol_dialecto.py` | Convierte cada error en una frase costeña. |
 | `costenol_exportar.py` | Generadores de código para otros lenguajes. |
 | `costenol_asistente.py` | Asistente de IA y su configuración. |
-| `web/` | `index.html`, `estilos.css`, `app.js`, `manual.html`, `assets/` (logos, ícono). |
+| `web/` | `index.html`, `estilos.css`, `app.js`, `movil.js`, `manual.html`, `manifest.webmanifest`, `assets/` (logos, íconos). |
 | `ejemplos/` | Programas `.cst` de ejemplo (válidos y con errores). La primera línea es `// Ejemplo: Título //`. |
 | `pruebas_*.py` | Pruebas automáticas (ver sección 10). |
 | `ejecutar.bat`, `construir_exe.bat/.py` | Abrir en Windows y construir `Costenol.exe`. |
@@ -138,9 +138,11 @@ Reglas que no se ven en la gramática (las implementan las fases indicadas):
 
 ### 4.6 `costenol_dialecto.py`
 
-* `frase(codigo, linea, mensaje)` devuelve `"<saludo> en la línea N. Error <tipo>: <causa>."`.
-* Todo el texto está en **tablas**: `APERTURAS_ERROR`, `APERTURAS_AVISO` y `CAUSAS` (código → plantilla con `{q0}`, `{g1}`…). Para cambiar el "habla" solo se editan las tablas.
-* El saludo se elige con la línea y el código (siempre el mismo para el mismo error).
+* `frase(codigo, linea, mensaje)` devuelve `"<reacción> en la línea N. Error <tipo>: <causa>"` (o `Advertencia:`). El formato es el que pidió el profesor.
+* **Cada código tiene su propia reacción y su propia causa**, en las tablas `REACCIONES` y `CAUSAS`. La expresión costeña se escoge porque encaja con lo que pasó (falta algo → «Ajá, ¿y el…?»; algo no cuadra → «Ese cuento no me cuadra»; un límite → «Bájale dos»; un aviso → «Pilas»); lo que no encaja queda con «Ojo, compa». Las causas pueden usar `{q0}`, `{q1}` (lo que va entre comillas en el mensaje formal) y `{g1}`… (grupos de una expresión regular).
+* `MENSAJES_PANTALLA` guarda las frases de la pantalla de salida (compilación limpia, ejecución terminada, dato no válido…); `web/app.js` usa esas mismas frases y una prueba comprueba que coincidan.
+* «Tú eres la monda, manito» es un elogio y solo sale en `compilacion_limpia`; «¿Qué es esa monda, loco?» solo en cuatro errores. `PALABRAS_PROHIBIDAS` lista lo que nunca debe aparecer y `pruebas_dialecto.py` lo vigila.
+* Si un código no tiene frase propia, se usa una reacción neutral y el mensaje formal como causa.
 
 ### 4.7 `costenol_exportar.py`
 
@@ -196,6 +198,15 @@ Reglas que no se ven en la gramática (las implementan las fases indicadas):
 
 **En la interfaz (`web/`)**: los `id` llevan prefijo según su función: `btn-` botones, `chk-` casillas, `pane-` paneles, `cnt-` contadores, `dlg-` ventanas, `asi-` asistente, `exp-` exportar, `sug-` autocompletado, `est-` barra de estado. Los datos guardados en el navegador usan la clave `costenol.…`. Las variables de entorno son `ANTHROPIC_API_KEY`, `COSTENOL_*`, `IA_LIMITE_*` y `ACCESO_*`.
 
+### Diseño responsive (celular y tableta)
+
+* `web/movil.js` se carga en la cabecera (antes de dibujar) y pone la clase `movil` en `<html>` cuando la pantalla mide 820 px o menos, o es un celular girado (`max-height: 520px` y `pointer: coarse`). También calcula `--alto-visible` (alto sin el teclado en pantalla) y pone la clase `teclado` cuando el teclado ocupa más de una cuarta parte.
+* Todo el CSS del celular está al final de `web/estilos.css`, en el bloque **MODO RESPONSIVE**, y cuelga de `html.movil …`. La tableta (821 a 1100 px) usa una `@media`.
+* En el celular `.principal` muestra una sola vista según `data-vista` (`editor`, `salida` o `resultados`); el asistente es una capa fija a pantalla completa y el menú lateral pasa a ser un cajón. `app.js` maneja esto con `esMovil()`, `setVista()`, `abrirMenu()` y `actualizarInsignia()`.
+* Los elementos que solo existen en el celular llevan la clase `solo-movil` (`btn-menu`, `barra-movil`). Si agrega un botón nuevo a la barra de herramientas, revise cómo se ve con el texto oculto (en el celular solo se muestra el ícono).
+* Cuidado con los nombres de clase repetidos: `asistente` es a la vez el panel del asistente y la burbuja de respuesta; por eso las reglas del panel usan `#asistente`.
+* Probado con el emulador de móvil de Chromium (iPhone, Android, tableta y celular girado); el teclado en pantalla real de iOS/Android no se ha probado en aparatos físicos.
+
 ## 7. API HTTP
 
 | Método y ruta | Para qué |
@@ -215,11 +226,11 @@ Reglas que no se ven en la gramática (las implementan las fases indicadas):
 
 **Un operador:** reconocerlo en `_Analizador` (léxico), darle precedencia en `Parser` (`aditiva`/`termino`), tipos en `Analizador.binario`, cálculo en `_binario` del intérprete y en cada generador.
 
-**Un mensaje de error:** emitirlo con `self.error("E-XXX-nn", …)`, **agregarlo al `CATALOGO` del módulo** (una prueba falla si falta) y agregar su frase en `CAUSAS` de `costenol_dialecto.py` (otra prueba lo exige).
+**Un mensaje de error:** emitirlo con `self.error("E-XXX-nn", …)`, **agregarlo al `CATALOGO` del módulo** (una prueba falla si falta) y agregar su reacción y su causa en `REACCIONES` y `CAUSAS` de `costenol_dialecto.py` (otra prueba lo exige). Escoja una expresión del diccionario solo si encaja con lo que pasó.
 
 **Un formato de exportación:** subclase de `Generador` (implementar los métodos de la clase base), registrarla en `exportar()` y `formatos()`, y agregar el formato a `pruebas_exportar.py`.
 
-**El habla costeña:** editar las tablas de `costenol_dialecto.py`.
+**El habla costeña:** editar `REACCIONES`, `CAUSAS` y `MENSAJES_PANTALLA` de `costenol_dialecto.py` (y, si cambia una frase de la pantalla, la misma frase en `web/app.js`).
 
 **Siempre:** correr todas las pruebas y actualizar `web/manual.html`. Cuando se publique una versión nueva (hoy la 1.0 aún no se ha lanzado), agregar su fila al historial de cambios y subir el número en `web/index.html` (barra de estado y ventana *Acerca de*).
 

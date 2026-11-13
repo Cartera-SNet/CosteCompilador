@@ -50,6 +50,8 @@
   let aceptando = false;
 
   const NOMBRE_FASE = { lexico: 'léxico', sintactico: 'sintáctico', semantico: 'semántico' };
+  // Texto de la pantalla según el modo: español formal o costeño (las frases costeñas están en costenol_dialecto.py).
+  const segunModo = (formal, costeno) => (modoCosteno ? costeno : formal);
 
   /* ===================================================================== */
   /*  Resaltado de sintaxis (solo colores; el análisis real es de Python)   */
@@ -153,6 +155,11 @@
   }
 
   function irA(linea, columna) {
+    if (esMovil() && PRINCIPAL.dataset.vista !== 'editor') {       // el editor estaba oculto: se muestra y se vuelve a intentar
+      setVista('editor');
+      requestAnimationFrame(() => irA(linea, columna));
+      return;
+    }
     const lineas = E.codigo.value.split('\n');
     if (linea < 1 || linea > lineas.length) return;
     let desplazamiento = 0;
@@ -173,6 +180,22 @@
     actualizarCursor();
   }
 
+  function mantenerCursorVisible() {
+    const t = E.codigo.value;
+    const pos = E.codigo.selectionEnd;
+    const linea = t.slice(0, pos).split('\n').length;
+    const colTexto = t.slice(t.lastIndexOf('\n', pos - 1) + 1, pos);
+    const cs = getComputedStyle(E.codigo);
+    const alto = parseFloat(cs.lineHeight);
+    const arriba = parseFloat(cs.paddingTop) + (linea - 1) * alto;
+    const a = E.area;
+    if (arriba < a.scrollTop) a.scrollTop = Math.max(0, arriba - alto);
+    else if (arriba + alto * 1.6 > a.scrollTop + a.clientHeight) a.scrollTop = arriba + alto * 1.6 - a.clientHeight;
+    const x = E.numeros.offsetWidth + parseFloat(cs.paddingLeft) + anchoVisual(colTexto) * medirCaracter();
+    if (x < a.scrollLeft + E.numeros.offsetWidth + 10) a.scrollLeft = Math.max(0, x - E.numeros.offsetWidth - 40);
+    else if (x + 12 > a.scrollLeft + a.clientWidth) a.scrollLeft = x + 12 - a.clientWidth + 40;
+  }
+
   function insertarTexto(t) {
     if (!document.execCommand('insertText', false, t)) {
       const s = E.codigo.selectionStart;
@@ -188,11 +211,12 @@
     else { sug = null; fantasma = null; }
     refrescarEditor();
     pintarSugerencias();
+    mantenerCursorVisible();
     if (marcasError.size || marcasAviso.size) quitarMarcas();
     guardarDocs();
     if (E.chkAuto.checked) {
       clearTimeout(temporizadorAuto);
-      temporizadorAuto = setTimeout(compilar, 900);
+      temporizadorAuto = setTimeout(() => compilar(true), 900);
     }
   });
   ['keyup', 'click', 'focus', 'select'].forEach((ev) => E.codigo.addEventListener(ev, actualizarCursor));
@@ -340,10 +364,11 @@
 
   function pintarSugerencias() {
     const caja = $('#sug-lista');
-    if (!sug || sug.items.length < 1 || (sug.items.length === 1 && fantasma)) { caja.hidden = true; return; }
+    if (!sug || sug.items.length < 1 || (sug.items.length === 1 && fantasma && !esTactil())) { caja.hidden = true; return; }
     caja.innerHTML = sug.items.map((c, i) =>
       `<div class="sug-item${i === sug.i ? ' activo' : ''}" role="option" data-i="${i}"><span class="sug-et">${esc(c.et)}</span><span class="sug-det">${esc(c.det)}</span></div>`).join('') +
-      (sug.items.length > 1 ? '<div class="sug-pie">Tab completa · ↑ ↓ cambian · Esc cierra</div>' : '<div class="sug-pie">Tab completa · Esc cierra</div>');
+      (esTactil() ? '<div class="sug-pie">Toca una opción para completar</div>'
+        : sug.items.length > 1 ? '<div class="sug-pie">Tab completa · ↑ ↓ cambian · Esc cierra</div>' : '<div class="sug-pie">Tab completa · Esc cierra</div>');
     caja.hidden = false;
     const t = E.codigo.value;
     const linea = t.slice(0, sug.inicio).split('\n').length;
@@ -392,8 +417,8 @@
     actualizarCursor();
   }
 
-  $('#sug-lista').addEventListener('mousedown', (e) => {
-    e.preventDefault();                                       // no quita el foco del editor
+  $('#sug-lista').addEventListener('pointerdown', (e) => {
+    e.preventDefault();                                       // no quita el foco del editor (ni cierra el teclado)
     const item = e.target.closest('.sug-item');
     if (item) aceptarSugerencia(Number(item.dataset.i));
   });
@@ -439,7 +464,8 @@
     limpiarResultados();
     mostrarDoc();
     guardarDocs();
-    E.codigo.focus();
+    if (esMovil()) setVista('editor');
+    else E.codigo.focus();
   }
 
   function activarDoc(id) {
@@ -518,8 +544,8 @@
 
   function consolaInicial() {
     consolaLimpiar();
-    linea('Listo.', 'verde');
-    linea('Escriba un programa y presione Ejecutar (F5).', 'gris');
+    linea(segunModo('Listo.', 'Listo, compa.'), 'verde');
+    linea(segunModo('Escriba un programa y presione Ejecutar (F5).', 'Escribe tu programa y presiona Ejecutar (F5).'), 'gris');
     linea('Aquí aparecerá lo que muestre su programa.', 'gris');
   }
 
@@ -581,9 +607,10 @@
   }
 
   /* ---- Compilar: solo revisa ---- */
-  async function compilar() {
+  async function compilar(automatico) {
     clearTimeout(temporizadorAuto);
     if (ocupado) return;
+    if (automatico !== true && esMovil()) setVista('salida');      // en el celular se muestra la salida
     ocupado = true; setBotones(false);
     await detenerSesion();
     setEstado('Compilando…', 'trabajando');
@@ -593,9 +620,12 @@
       pintarCompilacion(c);
       consolaLimpiar();
       if (c.exitoso) {
-        linea('> Compilación exitosa.', 'verde');
+        const limpia = !c.advertencias.length;
+        linea(segunModo('> Compilación exitosa.', '> ' + (limpia
+          ? 'Tú eres la monda, manito: compiló limpio, sin errores ni advertencias.'
+          : 'Ahí vamos: compiló, pero ojo con las advertencias.')), 'verde');
         linea('El programa no tiene errores.', '');
-        linea('Presione Ejecutar (F5) para correrlo.', 'gris');
+        linea(segunModo('Presione Ejecutar (F5) para correrlo.', 'Presiona Ejecutar (F5) para correrlo.'), 'gris');
         linea('', '');
         linea(`Tokens: ${c.tokens.length} (pestaña Reporte, abajo).`, 'gris');
         linea('Estructura: pestaña Árbol Sintáctico.', 'gris');
@@ -617,6 +647,7 @@
   async function ejecutar() {
     clearTimeout(temporizadorAuto);
     if (ocupado) return;
+    if (esMovil()) setVista('salida');
     ocupado = true; setBotones(false);
     await detenerSesion();
     consolaLimpiar();
@@ -642,12 +673,15 @@
 
   function manejarRespuesta(r) {
     (r.salida || []).forEach((t) => linea(t));
-    if (r.invalida) linea('Valor no válido: ' + r.invalida, 'rojo');
+    if (r.invalida) {
+      linea(segunModo('Valor no válido: ' + r.invalida,
+        'Eche, compa, ese dato no sirve: ' + r.invalida.charAt(0).toLowerCase() + r.invalida.slice(1)), 'rojo');
+    }
     if (r.error) {
       linea('', '');
       linea(modoCosteno && r.error.mensaje_costeno ? r.error.mensaje_costeno
         : `Error de ejecución (línea ${r.error.linea}): ${r.error.mensaje}`, 'rojo');
-      linea('Proceso finalizado con errores.', 'rojo');
+      linea(segunModo('Proceso finalizado con errores.', 'Se formó el bololó: el proceso terminó con errores.'), 'rojo');
       marcasError.add(r.error.linea);
       pintarMarcasLineas();
       sesionId = null;
@@ -661,7 +695,7 @@
     }
     if (r.terminado) {
       linea('', '');
-      linea('Proceso finalizado correctamente.', 'verde');
+      linea(segunModo('Proceso finalizado correctamente.', 'Todo bien, compa: el programa quedó al pelo.'), 'verde');
       sesionId = null;
       setEstado('Ejecución terminada', '');
     }
@@ -720,7 +754,10 @@
     const fuente = E.codigo.value.split('\n');
     const nombre = NOMBRE_FASE[c.fase_fallida] || '';
     linea(modo === 'ejecutar' ? '> No se pudo ejecutar el programa.' : '> La compilación falló.', 'rojo');
-    linea(`Hay ${plural(c.errores.length, 'error', 'errores')} en el análisis ${nombre}. Corríjalos y vuelva a intentar.`, 'gris');
+    const uno = c.errores.length === 1;
+    linea(`Hay ${plural(c.errores.length, 'error', 'errores')} en el análisis ${nombre}. ` +
+      segunModo(uno ? 'Corríjalo y vuelva a intentar.' : 'Corríjalos y vuelva a intentar.',
+        uno ? 'Arréglalo, compa, y vuelve a intentar.' : 'Arréglalos, compa, y vuelve a intentar.'), 'gris');
     linea('', '');
     c.errores.slice(0, 6).forEach((d) => {
       linea(modoCosteno && d.mensaje_costeno ? d.mensaje_costeno : `Línea ${d.linea}, col. ${d.columna}: ${d.mensaje}`, 'rojo');
@@ -756,6 +793,7 @@
     resultadoVigente = true;
     const nErr = c.errores.length;
     const nAvi = c.advertencias.length;
+    actualizarInsignia(nErr, nAvi);
 
     marcasError = new Set(c.errores.map((d) => d.linea));
     marcasAviso = new Set(c.advertencias.map((d) => d.linea));
@@ -907,11 +945,14 @@
   });
 
   function limpiarResultados() {
+    actualizarInsignia(0, 0);
     detenerSesion();
     ultima = null;
     resultadoVigente = false;
     quitarMarcas();
-    $('#pane-mensajes').innerHTML = '<ul class="lista"><li><svg><use href="#i-ok"/></svg>[INFO] Listo. Presione Compilar (F7) para revisar el programa o Ejecutar (F5) para correrlo.</li></ul>';
+    $('#pane-mensajes').innerHTML = '<ul class="lista"><li><svg><use href="#i-ok"/></svg>[INFO] ' +
+      segunModo('Listo. Presione Compilar (F7) para revisar el programa o Ejecutar (F5) para correrlo.',
+        'Listo, compa. Presiona Compilar (F7) para revisar el programa o Ejecutar (F5) para correrlo.') + '</li></ul>';
     ['errores', 'advertencias', 'reporte'].forEach((p) => {
       $('#pane-' + p).innerHTML = '<div class="sin-datos">Aún no hay resultados. Presione Compilar o Ejecutar.</div>';
     });
@@ -985,6 +1026,48 @@
     analizador: $('#dlg-analizador'), acerca: $('#dlg-acerca'),
   };
 
+  /* ===================================================================== */
+  /*  Modo celular: una vista a la vez, menú desplegable y barra inferior   */
+  /* ===================================================================== */
+  const esMovil = () => document.documentElement.classList.contains('movil');
+  const esTactil = () => window.matchMedia('(pointer: coarse)').matches;
+  const PRINCIPAL = $('#principal');
+
+  function marcarBarra(v) {
+    $$('#barra-movil button').forEach((b) => b.classList.toggle('activo', b.dataset.vista === v));
+  }
+  function setVista(v) {
+    if (!esMovil()) return;
+    if (v === 'asistente') { abrirAsistente(); return; }
+    if (A.panel && !A.panel.hidden) cerrarAsistente();
+    PRINCIPAL.dataset.vista = v;
+    marcarBarra(v);
+    if (v === 'editor') actualizarCursor();
+  }
+  function abrirMenu(abrir) {
+    $('#lateral').classList.toggle('abierto', abrir);
+    $('#cortina').hidden = !abrir;
+    $('#btn-menu').setAttribute('aria-expanded', String(abrir));
+  }
+  function actualizarInsignia(nErr, nAvi) {
+    const b = $('#badge-resultados');
+    const n = nErr || nAvi;
+    b.hidden = !n;
+    b.textContent = n > 99 ? '99+' : String(n || 0);
+    b.classList.toggle('aviso', !nErr);
+  }
+  $('#btn-menu').addEventListener('click', () => abrirMenu(!$('#lateral').classList.contains('abierto')));
+  $('#cortina').addEventListener('click', () => abrirMenu(false));
+  $('#barra-movil').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-vista]');
+    if (b) setVista(b.dataset.vista);
+  });
+  document.addEventListener('movilcambio', () => {
+    abrirMenu(false);
+    if (esMovil()) setVista('editor');
+    if (document.documentElement.style.getPropertyValue('--tam-codigo')) aplicarTamano($('#rng-tam').value);
+  });
+
   function marcarNav(nombre) {
     $$('.nav-item').forEach((b) => b.classList.toggle('activo', b.dataset.nav === nombre));
   }
@@ -996,8 +1079,9 @@
   $$('.nav-item').forEach((b) => {
     b.addEventListener('click', () => {
       const n = b.dataset.nav;
-      if (n === 'inicio') { marcarNav('inicio'); E.codigo.focus(); return; }
-      if (n === 'asistente') { alternarAsistente(); return; }
+      if (esMovil()) abrirMenu(false);
+      if (n === 'inicio') { marcarNav('inicio'); if (esMovil()) setVista('editor'); else E.codigo.focus(); return; }
+      if (n === 'asistente') { if (esMovil()) setVista('asistente'); else alternarAsistente(); return; }
       marcarNav(n);
       if (n === 'ejemplos') cargarEjemplos();
       if (n === 'manual') cargarManual();
@@ -1267,12 +1351,14 @@
     marcarNav('asistente');
     pintarChat();
     cargarEstadoIA();
-    A.texto.focus();
+    if (esMovil()) marcarBarra('asistente');
+    else A.texto.focus();                                       // en el celular no se abre el teclado solo
   }
   function cerrarAsistente() {
     A.panel.hidden = true;
     A.cuerpo.classList.remove('con-asistente');
     marcarNav('inicio');
+    if (esMovil()) marcarBarra(PRINCIPAL.dataset.vista);
   }
   function alternarAsistente() { if (A.panel.hidden) abrirAsistente(); else cerrarAsistente(); }
 
@@ -1482,8 +1568,9 @@
   /* ---- Configuración ---- */
   function aplicarTamano(valor) {
     const p = Number(valor) / 100;
-    document.documentElement.style.setProperty('--tam-codigo', `${(1.15 * p).toFixed(3)}rem`);
-    document.documentElement.style.setProperty('--alto-linea', `${(1.55 * p).toFixed(3)}rem`);
+    const base = esMovil() ? [1.0, 1.5] : [1.15, 1.55];
+    document.documentElement.style.setProperty('--tam-codigo', `${(base[0] * p).toFixed(3)}rem`);
+    document.documentElement.style.setProperty('--alto-linea', `${(base[1] * p).toFixed(3)}rem`);
     $('#val-tam').textContent = `${valor} %`;
     $('#rng-tam').value = valor;
   }

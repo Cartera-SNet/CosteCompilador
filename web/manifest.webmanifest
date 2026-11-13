@@ -1,0 +1,26 @@
+{
+  "name": "Costeñol Compilador",
+  "short_name": "Costeñol",
+  "description": "Compila, analiza y ejecuta programas en Costeñol",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "es",
+  "background_color": "#08224a",
+  "theme_color": "#08224a",
+  "icons": [
+    {
+      "src": "assets/icono-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icono-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

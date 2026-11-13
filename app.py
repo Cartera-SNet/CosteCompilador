@@ -60,6 +60,7 @@ TIEMPO_CONEXION = 60               # s: una conexión inactiva se cierra
 
 mimetypes.add_type("text/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
+mimetypes.add_type("application/manifest+json", ".webmanifest")
 
 POLITICA_CONTENIDO = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
                       "img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; "

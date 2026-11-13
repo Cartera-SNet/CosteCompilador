@@ -281,6 +281,17 @@ Mensaje.Texto("Tu edad es: " + edad + " años");
     <tr><td><strong>Barra de estado</strong></td><td>Qué está haciendo el compilador y la línea y columna del cursor.</td></tr>
   </tbody>
 </table>
+<h3>En el celular o la tableta</h3>
+<p>En pantallas pequeñas el compilador se reorganiza para que se vea completo y se pueda manejar con el dedo:</p>
+<ul>
+  <li><strong>Barra de abajo:</strong> <em>Editor</em>, <em>Salida</em>, <em>Resultados</em> (con un globito que cuenta los errores) y <em>Asistente</em>. Se muestra una sola cosa a la vez.</li>
+  <li><strong>Ejecutar</strong> y <strong>Compilar</strong> siempre están arriba; al tocarlos pasa solo a <em>Salida</em>. Los demás botones (Nuevo, Abrir, Guardar, Exportar y Configuración) se alcanzan deslizando esa fila hacia la izquierda.</li>
+  <li><strong>El botón ☰</strong> (arriba a la izquierda) abre el menú: Ejemplos, Analizador, Manual de uso y Acerca de.</li>
+  <li>Al tocar un error en <em>Resultados</em>, el compilador vuelve al editor en esa línea.</li>
+  <li>El <strong>autocompletado</strong> aparece como una lista pequeña: toque la opción para completar (no hace falta Tab).</li>
+  <li>El asistente y las ventanas (manual, ejemplos, exportar) ocupan toda la pantalla; se cierran con la ✕.</li>
+  <li>Desde el navegador del celular puede usar <em>Añadir a la pantalla de inicio</em> para tenerlo como una aplicación.</li>
+</ul>
 <h3>Autocompletado</h3>
 <p>Mientras escribe en el editor, el compilador le <strong>sugiere cómo seguir</strong>: aparece el resto de la palabra en gris y, si hay varias opciones, una lista. Presione <kbd>Tab</kbd> para completar.</p>
 <table>
@@ -361,16 +372,16 @@ Mensaje.Texto("Tu edad es: " + edad + " años");
 </ol>
 <p>Si pasa las tres, se ejecuta. Aun así pueden ocurrir <em>errores de ejecución</em>, como dividir por cero cuando el divisor lo escribe el usuario.</p>
 <h3>Los errores hablan en costeño</h3>
-<p>Costeñol se llama así porque el compilador habla como costeño. Cada error y cada advertencia dice <strong>la línea</strong>, <strong>el tipo de error</strong> y <strong>la causa</strong>, con este formato:</p>
+<p>Costeñol se llama así porque el compilador habla como costeño. Cada error y cada advertencia dice <strong>la línea</strong>, <strong>el tipo de error</strong> y <strong>la causa</strong>, con este formato. La reacción del comienzo <strong>cambia según lo que pasó</strong>: no es la misma cuando falta algo («Ajá, ¿y el punto y coma?»), cuando algo no cuadra («Ese cuento no me cuadra»), cuando se pasó de un límite («Bájale dos») o cuando es solo un aviso («Pilas»).</p>
 <div class="nota"><code>&lt;saludo&gt; en la línea N. Error &lt;tipo&gt;: &lt;causa&gt;.</code><br>Tipos: <em>léxico</em> (palabras o símbolos que no existen), <em>sintáctico</em> (orden incorrecto), <em>semántico</em> (no tiene sentido, por ejemplo una variable sin declarar) y <em>de ejecución</em> (falla al correr, por ejemplo dividir por cero).</div>
-<p>Si prefiere el mensaje en español formal, en <em>Configuración</em> desmarque «Mensajes de error en costeño». Al dejar el mouse sobre un error se ve además el detalle técnico, y el código (por ejemplo <code>E-SEM-01</code>) sirve para buscarlo en el catálogo.</p>
+<p>También hablan costeño los mensajes de la pantalla de salida: cuando todo sale bien, el compilador lo celebra («Tú eres la monda, manito: compiló limpio…»), y cuando algo se enreda lo dice a su manera («Se formó el bololó…»). Si prefiere el mensaje en español formal, en <em>Configuración</em> desmarque «Mensajes de error en costeño». Al dejar el mouse sobre un error se ve además el detalle técnico, y el código (por ejemplo <code>E-SEM-01</code>) sirve para buscarlo en el catálogo.</p>
 <h3>Ejemplo de un error</h3>
 <pre class="codigo" data-error>
 edad Entero
 edad = 20;
 Mensaje.Texto(edad);
 </pre>
-<div class="error-ej"><strong>Mira, mi llave, en la línea 1 hay un enredo. Error sintáctico: te faltó el punto y coma al final de la instrucción.</strong> (columna 12) &mdash; <code>E-SIN-01</code></div>
+<div class="error-ej"><strong>Ajá, ¿y el punto y coma? Se te quedó por fuera en la línea 1. Error sintáctico: toda instrucción termina con ;</strong> (columna 12) &mdash; <code>E-SIN-01</code></div>
 <p>La línea indica dónde corregir y el código (<code>E-SIN-01</code>) se busca en el catálogo de abajo para ver cómo solucionarlo.</p>
 <div class="nota">Una sola equivocación a veces causa varios avisos. Corrija <strong>siempre el primer error de la lista</strong> y vuelva a compilar: muchos de los demás desaparecen solos.</div>
 
@@ -408,6 +419,6 @@ Mensaje.Texto(edad);
 <table>
   <thead><tr><th>Versión</th><th>Qué incluye</th></tr></thead>
   <tbody>
-    <tr><td>1.0</td><td>Primera versión del compilador de Costeñol: editor con pestañas y autocompletado; análisis léxico, sintáctico y semántico; ejecución con lectura de datos; errores y advertencias en costeño (o en español formal); árbol sintáctico, tabla de símbolos y reporte de tokens; exportar a Python, JavaScript, página web y Java; asistente de IA; este manual; y funcionamiento en el computador (.bat o .exe) y en línea.</td></tr>
+    <tr><td>1.0</td><td>Primera versión del compilador de Costeñol: editor con pestañas y autocompletado; análisis léxico, sintáctico y semántico; ejecución con lectura de datos; errores y advertencias en costeño (o en español formal); árbol sintáctico, tabla de símbolos y reporte de tokens; exportar a Python, JavaScript, página web y Java; asistente de IA; este manual; y funcionamiento en el computador (.bat o .exe), en línea y en el celular.</td></tr>
   </tbody>
 </table>

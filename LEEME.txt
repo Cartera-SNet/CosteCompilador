@@ -27,13 +27,30 @@ CÓMO USARLO (el detalle está en el botón "Manual de uso")
   - COMPILAR (F7): solo revisa el programa; no lo ejecuta.
   - Los errores se muestran con su línea y columna y se marcan en el editor.
 
+EN EL CELULAR O LA TABLETA  (modo responsive)
+  La interfaz se adapta sola al tamaño de la pantalla:
+    - Tableta (821 a 1100 px): el menú lateral queda solo con íconos.
+    - Celular (820 px o menos, o un celular girado): una vista a la vez con una barra inferior
+      (Editor, Salida, Resultados con globito de errores, Asistente), menú ☰ desplegable,
+      Ejecutar y Compilar siempre a la mano, ventanas a pantalla completa, autocompletado
+      táctil y aviso del teclado en pantalla. Se puede "Añadir a la pantalla de inicio".
+  Archivos: web/movil.js (detecta el modo), el bloque RESPONSIVE al final de web/estilos.css,
+  web/manifest.webmanifest y los íconos web/assets/icono-*.png.
+
 MENSAJES EN COSTEÑO
   Los errores y advertencias hablan como costeño, con el formato que pidió el profesor:
-      <saludo> en la línea N. Error <léxico|sintáctico|semántico|de ejecución>: <causa>.
-  Ejemplo:  Pilas, compa, algo falló en la línea 5. Error semántico: la variable 'x' no está declarada.
-  En Configuración se pueden cambiar a español formal. Todas las frases están en tablas dentro de
-  costenol_dialecto.py (APERTURAS_ERROR, APERTURAS_AVISO y CAUSAS): para mejorar el "habla" solo hay
-  que editar esas tablas; una prueba (pruebas_dialecto.py) exige una frase por cada código de error.
+      <reacción> en la línea N. Error <léxico|sintáctico|semántico|de ejecución>: <causa>.
+  Ejemplo:  Ojo, la cagaste en la línea 5. Error semántico: la variable 'x' no está declarada.
+  Cada código de error tiene SU PROPIA reacción, escogida del Gran diccionario de Costeñol porque
+  encaja con lo que pasó (falta algo = «Ajá, ¿y el punto y coma?»; algo no cuadra = «Ese cuento no me
+  cuadra»; un límite = «Bájale dos»; un aviso = «Pilas»…). Lo que no encaja con ninguna expresión
+  queda con un «Ojo, compa» y una explicación clara. «¿Qué es esa monda, loco?» va en 4 errores donde
+  lo escrito es raro, y «Tú eres la monda, manito» es un elogio: solo sale al compilar sin errores
+  ni advertencias. No se usan groserías fuertes ni insultos (una prueba lo vigila).
+  También están en costeño los mensajes de la pantalla de salida («Todo bien, compa: el programa quedó al
+  pelo.», «Se formó el bololó…»). En Configuración todo se puede pasar a español formal.
+  Todas las frases están en tablas dentro de costenol_dialecto.py (REACCIONES, CAUSAS y
+  MENSAJES_PANTALLA); pruebas_dialecto.py exige una reacción y una causa por cada código de error.
 
 MANUAL DE PROGRAMADOR
   MANUAL_PROGRAMADOR.md explica a otro desarrollador cómo está hecho el compilador: módulos y

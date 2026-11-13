@@ -32,8 +32,8 @@ html {
 body {
   margin: 0;
   height: 100%;
-  min-width: 900px;
-  min-height: 520px;
+  min-width: 0;
+  min-height: 0;
   background: #dfe8f3;
   font-family: var(--fuente-ui);
   font-size: 1.05rem;
@@ -772,3 +772,146 @@ dialog.acerca-dlg { width: min(34rem, 92vw); border-radius: 1rem; }
 }
 .miembro strong { font-size: 1.12rem; color: var(--azul-titulo); }
 .miembro small { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12rem; text-transform: uppercase; color: #7a8ca8; }
+
+/* ====================================================================== */
+/*  MODO RESPONSIVE                                                        */
+/*  · tableta (821 a 1100 px): menú lateral solo con íconos                */
+/*  · celular (html.movil, lo pone movil.js): una vista a la vez, menú     */
+/*    desplegable, barra inferior, ventanas a pantalla completa            */
+/* ====================================================================== */
+.solo-movil { display: none; }
+.cortina { position: fixed; inset: 0; z-index: 35; background: rgba(4, 20, 45, 0.55); }
+.cortina[hidden] { display: none; }
+
+@media (max-width: 1100px) and (min-width: 821px) {
+  .cuerpo { grid-template-columns: 4.6rem minmax(0, 1fr); }
+  .cuerpo.con-asistente { grid-template-columns: 4.6rem minmax(0, 1fr) 24rem; }
+  .lateral { padding: 1.2rem 0.4rem 0.8rem; }
+  .nav-item { justify-content: center; padding: 0; }
+  .nav-item span { display: none; }
+  .logo-lateral { display: none; }
+  .btn-herr, .btn-claro { padding: 0 0.7rem; }
+  .proyecto { display: none; }
+}
+
+/* ---------- celular ---------- */
+html.movil { font-size: 16px; --tam-codigo: 1rem; --alto-linea: 1.5rem; }
+html.movil body { background: #08224a; }
+html.movil .ventana {
+  height: var(--alto-visible, 100dvh); border: 0; border-radius: 0;
+  grid-template-rows: 3rem minmax(0, 1fr) 1.9rem auto;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) 0 env(safe-area-inset-left, 0);
+}
+html.movil.teclado .ventana { grid-template-rows: 3rem minmax(0, 1fr); }
+html.movil.teclado .estado, html.movil.teclado .barra-movil { display: none; }
+
+/* barra de título: botón de menú, sin los controles de ventana */
+html.movil .barra-titulo { padding-left: 0.2rem; }
+html.movil .controles-ventana { display: none; }
+html.movil .titulo-ventana { margin-left: 0.6rem; font-size: 1.15rem; }
+html.movil .btn-menu { display: grid; place-items: center; width: 3rem; height: 3rem; background: transparent; border: 0; color: #fff; }
+html.movil .btn-menu svg { width: 1.6rem; height: 1.6rem; }
+
+/* menú lateral como cajón */
+html.movil .cuerpo, html.movil .cuerpo.con-asistente { grid-template-columns: minmax(0, 1fr); }
+html.movil .lateral {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; width: min(18rem, 84vw);
+  padding: calc(1rem + env(safe-area-inset-top, 0)) 0.8rem 0.8rem; overflow-y: auto;
+  transform: translateX(-105%); transition: transform 0.22s ease; box-shadow: 0 0 2.4rem rgba(0, 0, 0, 0.55);
+}
+html.movil .lateral.abierto { transform: none; }
+html.movil .nav-item { height: 3.3rem; font-size: 1.1rem; }
+
+/* área principal: una vista a la vez */
+html.movil .principal { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0.5rem 0.4rem; }
+html.movil .herramientas { flex: none; flex-wrap: nowrap; gap: 0.45rem; overflow-x: auto; padding-bottom: 0.15rem; scrollbar-width: none; }
+html.movil .herramientas::-webkit-scrollbar { display: none; }
+html.movil .herramientas > * { flex: none; }
+html.movil .proyecto, html.movil .separador { display: none; }
+html.movil #btn-ejecutar { order: 1; }
+html.movil #btn-compilar { order: 2; }
+html.movil .grupo-archivo { order: 3; }
+html.movil #btn-exportar { order: 4; }
+html.movil #btn-config { order: 5; }
+html.movil .btn-accion { height: 2.9rem; min-width: 0; padding: 0 1rem; }
+html.movil .btn-herr, html.movil .btn-claro { font-size: 0; gap: 0; height: 2.9rem; padding: 0 0.85rem; }
+html.movil .btn-herr svg, html.movil .btn-claro svg { width: 1.4rem; height: 1.4rem; }
+
+html.movil .zona-superior { display: block; flex: 1 1 0; min-height: 0; position: relative; }
+html.movil .zona-superior > .editor, html.movil .zona-superior > .salida { position: absolute; inset: 0; }
+html.movil .principal[data-vista="editor"] .salida,
+html.movil .principal[data-vista="salida"] .editor,
+html.movil .principal[data-vista="editor"] .inferior,
+html.movil .principal[data-vista="salida"] .inferior,
+html.movil .principal[data-vista="resultados"] .zona-superior { display: none; }
+html.movil .principal[data-vista="resultados"] .inferior { flex: 1 1 0; min-height: 0; }
+
+/* editor */
+html.movil .numeros { min-width: 2.5rem; padding: 0.4rem 0.5rem 0.4rem 0.3rem; }
+html.movil .btn-limpiar-codigo { font-size: 0; gap: 0; padding: 0 0.75rem; height: 2.6rem; min-width: 2.75rem; justify-content: center; }
+html.movil .btn-limpiar-codigo svg { width: 1.2rem; height: 1.2rem; }
+html.movil .tira-archivos { padding-top: 0.3rem; }
+html.movil input, html.movil textarea, html.movil select { font-size: 16px; }   /* evita el zoom automático de iPhone */
+html.movil .sug-lista { min-width: 14rem; max-width: 88vw; font-size: 1rem; }
+html.movil .sug-item { padding: 0.55rem 0.7rem; }
+
+/* salida y resultados */
+html.movil .consola { font-size: 0.98rem; line-height: 1.4rem; padding: 0.6rem 0.7rem; }
+html.movil .salida-cabecera { min-height: 2.8rem; }
+html.movil .inferior .pestana, html.movil .inferior [role="tab"] { padding: 0.65rem 0.9rem; }
+
+/* barra de estado reducida */
+html.movil .estado { font-size: 0.85rem; padding-left: 0.7rem; }
+html.movil .est-bloque:not(:first-child) { display: none; }
+
+/* barra inferior */
+html.movil .barra-movil {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: linear-gradient(#0b3068, #082852); border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.barra-movil button {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.18rem;
+  min-height: 3.5rem; background: transparent; border: 0; color: #b9cfee; font-size: 0.8rem; font-weight: 600;
+}
+.barra-movil button svg { width: 1.5rem; height: 1.5rem; }
+.barra-movil button.activo { color: #fff; background: rgba(255, 255, 255, 0.1); box-shadow: inset 0 3px 0 #3da0ff; }
+.barra-movil .badge {
+  position: absolute; top: 0.3rem; left: calc(50% + 0.55rem); min-width: 1.25rem; height: 1.25rem; padding: 0 0.3rem;
+  display: grid; place-items: center; border-radius: 0.7rem; background: #d93025; color: #fff; font-size: 0.75rem; font-weight: 700;
+}
+.barra-movil .badge.aviso { background: #e08a00; }
+.barra-movil .badge[hidden] { display: none; }
+
+/* asistente a pantalla completa */
+html.movil #asistente { position: fixed; inset: 0; z-index: 45; height: var(--alto-visible, 100dvh); border-left: 0; padding-top: env(safe-area-inset-top, 0); }
+
+/* ventanas (ejemplos, manual, exportar, configuración…) a pantalla completa */
+html.movil dialog {
+  width: 100vw; max-width: 100vw; height: var(--alto-visible, 100dvh); max-height: var(--alto-visible, 100dvh);
+  margin: 0; border-radius: 0;
+}
+html.movil dialog.acerca-dlg { width: min(26rem, 94vw); height: auto; max-height: 94dvh; margin: auto; border-radius: 1rem; }
+html.movil .dlg-cab { padding: 0.5rem 0.4rem 0.5rem 1rem; padding-top: calc(0.5rem + env(safe-area-inset-top, 0)); }
+html.movil .dlg-x { width: 2.8rem; height: 2.8rem; }
+html.movil .dlg-cuerpo { padding: 0.8rem; }
+
+/* manual: índice como fila de botones deslizable */
+html.movil .manual-cuerpo { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+html.movil .manual-indice { display: flex; gap: 0.4rem; overflow-x: auto; overflow-y: hidden; border-right: 0; border-bottom: 1px solid var(--borde); padding: 0.5rem 0.6rem; }
+html.movil .manual-indice a { flex: none; white-space: nowrap; padding: 0.45rem 0.8rem; border-radius: 1rem; background: #fff; border: 1px solid #cfe0f7; font-size: 0.92rem; }
+html.movil .manual-indice a.sub { padding-left: 0.8rem; color: inherit; }
+html.movil .manual-indice a.activo, html.movil .manual-indice a.activa { background: #1b6fe0; color: #fff; border-color: #1b6fe0; }
+html.movil .manual-contenido { padding: 0.8rem 0.9rem 2rem; font-size: 1rem; }
+html.movil .manual-contenido table { display: block; overflow-x: auto; }
+html.movil .manual-contenido .pasos { grid-template-columns: minmax(0, 1fr); }
+html.movil .manual-contenido .si-no { grid-template-columns: minmax(0, 1fr); }
+
+/* celular girado: se gana espacio */
+@media (orientation: landscape) and (max-height: 520px) {
+  html.movil .ventana { grid-template-rows: 2.4rem minmax(0, 1fr) auto; }
+  html.movil .estado { display: none; }
+  html.movil .barra-movil button { min-height: 2.6rem; flex-direction: row; gap: 0.4rem; }
+  html.movil .btn-menu { height: 2.4rem; }
+  html.movil .btn-accion, html.movil .btn-herr, html.movil .btn-claro { height: 2.5rem; }
+}
