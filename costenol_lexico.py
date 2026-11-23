@@ -104,6 +104,7 @@ class Token:
     valor: str
     linea: int
     columna: int
+    antes: str = ""     # espacios o tabuladores que hay justo antes del token, en su misma línea
 
 
 @dataclass
@@ -224,7 +225,13 @@ class _Analizador:
         self.res.lineas = len(lineas)
 
         for numero, texto in enumerate(lineas, start=1):
+            antes_de = len(self.res.tokens)
             self._linea(numero, texto)
+            for tok in self.res.tokens[antes_de:]:                   # los espacios que preceden a cada token
+                j = i = tok.columna - 1
+                while j > 0 and texto[j - 1] in " \t":
+                    j -= 1
+                tok.antes = texto[j:i]
             if self._detenido:
                 break
 

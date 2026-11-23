@@ -144,6 +144,7 @@ PRUEBAS  (no gastan dinero ni necesitan internet; el asistente se prueba con un 
     python pruebas_asistente.py
     python pruebas_servidor.py
     python pruebas_dialecto.py
+    python pruebas_reglamento.py    (la matriz del reglamento: cada regla del PDF y de la clase, aceptada y rechazada)
     python pruebas_nube.py          (arranca el programa en modo nube y comprueba que responda)
     python pruebas_exportar.py      (tarda ~1 minuto: compara cada formato con el intérprete; usa
                                      Node.js y un JDK si están instalados, y omite lo que falte)
@@ -171,14 +172,22 @@ REGLAS DEL LENGUAJE (resumen; completas en el manual, sección 2)
     Captura Mensaje Si Sino FinSi Verdadero Falso.
   - Declarar: nombre Tipo;      Asignar: nombre = valor;
     Leer: nombre = Captura.Tipo();      Mostrar: Mensaje.Texto(valor);
-  - Condicional: Si (condición) ... Sino ... FinSi   (espacio después de Si; Sino y
-    FinSi solos en su línea; Sino es opcional; se pueden anidar).
+  - Condicional: Si (condición) ... Sino ... FinSi   (EXACTAMENTE un espacio después de Si, ni
+    cero ni dos; Sino y FinSi solos en su línea; Sino es opcional; se pueden anidar).
   - Comentarios: // texto //     Decimales con coma: 3,1416
   - Las variables se declaran una vez, fuera de los Si, antes de usarse, y solo
-    guardan valores de su tipo (un Entero sí cabe en un Real).
+    guardan valores de su tipo (en una asignación, un Entero sí cabe en un Real).
+  - Captura.Tipo() debe ser EXACTAMENTE del tipo de la variable (una variable Real se lee con
+    Captura.Real(); leer un Entero en un Real, o al revés, es un error). Mensaje.Texto(...) y
+    Captura.Tipo() se escriben todo juntos, sin espacios.
   - Una variable NO puede llamarse como un tipo de dato ni como una palabra reservada, ni
     cambiando mayúsculas: "entero Entero;" es un error (regla del profesor).
   - La división (/) siempre da Real. + también une textos.
+
+VERIFICACIÓN DEL REGLAMENTO
+  pruebas_reglamento.py tiene la matriz completa: cada regla del enunciado y de la clase del 6 de
+  noviembre, con casos que el compilador debe ACEPTAR y casos que debe RECHAZAR (con el código del
+  error esperado). Todos los casos pasan. python pruebas_reglamento.py --informe imprime la matriz.
 
 PENDIENTE DE CONFIRMAR CON EL PROFESOR
   Estas reglas NO están en el enunciado: son propuesta del equipo. Se pueden cambiar
@@ -195,4 +204,3 @@ PENDIENTE DE CONFIRMAR CON EL PROFESOR
       (hoy se rechazan todas, con cualquier mayúscula), y no solo para los tipos de dato.
     - Los formatos de Exportar (Python, JavaScript, HTML, Java, .jar): ¿el profesor espera
       alguno en particular?
-    - Si se quiere una forma más corta de escribir Mensaje.Texto (ver conversación).

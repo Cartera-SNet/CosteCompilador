@@ -98,6 +98,7 @@ REACCIONES = {
     "E-SIN-25": "Mi llave, estás enredado en la línea {n}.",
     "E-SIN-26": "Ojo, compa, en la línea {n} '{q0}' está mal escrito.",
     "E-SIN-27": "Suave ahí, compa, en la línea {n} '{q0}' no sirve de nombre.",
+    "E-SIN-29": "Suave ahí, compa, que en la línea {n} le sobran espacios al Si.",
     "E-SIN-28": "Ajá, ¿y el operador? Se te quedaron dos valores pegados en la línea {n}.",
     "E-SIN-97": "¡Qué vaina! Se enredó algo por dentro en la línea {n}.",
     # -- semántico
@@ -164,8 +165,8 @@ CAUSAS = {
     "E-SIN-11": (None, "solo se permite uno."),
     "E-SIN-12": (None, "van solitos en su línea."),
     "E-SIN-13": (None, "va Si, un espacio y luego el paréntesis."),
-    "E-SIN-14": (None, "va así: variable = Captura.Tipo();"),
-    "E-SIN-15": (None, "va así: Mensaje.Texto(valor);"),
+    "E-SIN-14": (None, "va así, todo junto y sin espacios: variable = Captura.Tipo();"),
+    "E-SIN-15": (None, "va así, todo junto y sin espacios: Mensaje.Texto(valor);"),
     "E-SIN-16": (None, "las variables se declaran al inicio, fuera de los Si."),
     "E-SIN-17": (None, "dentro del Si se compara con ==; el = es para guardar valores."),
     "E-SIN-18": (None, "haz una sola comparación por condición."),
@@ -178,6 +179,7 @@ CAUSAS = {
     "E-SIN-25": (None, "hay demasiados paréntesis, Si anidados u operaciones (máximo 40 niveles y 150 operaciones); pártelo en pasos."),
     "E-SIN-26": (None, "aquí las mayúsculas importan; se escribe '{correcta}'."),
     "E-SIN-27": (None, "una variable no puede llamarse como un tipo ni como una palabra reservada, ni cambiando las mayúsculas."),
+    "E-SIN-29": (None, "entre Si y el paréntesis va un solo espacio, ni uno más ni uno menos."),
     "E-SIN-28": (None, "entre dos valores va un operador (+ - * /); un número no puede ir pegado a un paréntesis, como en 1("),
     "E-SIN-97": (None, "vuelve a intentar."),
     # -- semántico

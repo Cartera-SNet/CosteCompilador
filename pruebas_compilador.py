@@ -121,9 +121,14 @@ class Sintaxis(unittest.TestCase):
     def test_si_sin_espacio_antes_del_parentesis(self):
         self.assertEqual(codigos("x Entero;\nx = 1;\nSi(x > 0)\nFinSi"), ["E-SIN-13"])
 
-    def test_si_con_espacio_o_salto_es_valido(self):
-        self.assertTrue(compilar("x Entero;\nx = 1;\nSi   (x > 0)\nFinSi")["exitoso"])
-        self.assertTrue(compilar("x Entero;\nx = 1;\nSi\n(x > 0)\nFinSi")["exitoso"])
+    def test_si_lleva_exactamente_un_espacio(self):
+        self.assertTrue(compilar("x Entero;\nx = 1;\nSi (x > 0)\nFinSi")["exitoso"])
+        self.assertEqual(codigos("x Entero;\nx = 1;\nSi   (x > 0)\nFinSi"), ["E-SIN-29"])
+        self.assertEqual(codigos("x Entero;\nx = 1;\nSi  (x > 0)\nFinSi"), ["E-SIN-29"])
+        self.assertEqual(codigos("x Entero;\nx = 1;\nSi\t(x > 0)\nFinSi"), ["E-SIN-29"])
+        self.assertEqual(codigos("x Entero;\nx = 1;\nSi(x > 0)\nFinSi"), ["E-SIN-13"])
+        self.assertEqual(codigos("x Entero;\nx = 1;\nSi\n(x > 0)\nFinSi"), ["E-SIN-06"])
+        self.assertIn("2 espacios", compilar("x Entero;\nx = 1;\nSi  (x > 0)\nFinSi")["errores"][0]["mensaje"])
 
     def test_si_sin_parentesis(self):
         self.assertIn("E-SIN-06", codigos("Si x > 0\nFinSi"))
@@ -382,7 +387,9 @@ class Semantica(unittest.TestCase):
         self.assertEqual(codigos("n Entero;\nn = Captura.Texto();"), ["E-SEM-08"])
         self.assertEqual(codigos("n Entero;\nn = Captura.Real();"), ["E-SEM-08"])
         self.assertEqual(codigos("t Texto;\nt = Captura.Entero();"), ["E-SEM-08"])
-        self.assertTrue(compilar("r Real;\nr = Captura.Entero();\nMensaje.Texto(r);")["exitoso"])
+        self.assertEqual(codigos("r Real;\nr = Captura.Entero();\nMensaje.Texto(r);"), ["E-SEM-08"])   # ni un Entero en un Real
+        self.assertEqual(codigos("l Logico;\nl = Captura.Texto();"), ["E-SEM-08"])
+        self.assertTrue(compilar("r Real;\nr = Captura.Real();\nMensaje.Texto(r);")["exitoso"])
 
     def test_variable_sin_valor(self):
         self.assertEqual(codigos("x Entero;\nMensaje.Texto(x);"), ["E-SEM-09"])
@@ -470,7 +477,9 @@ class Ejecucion(unittest.TestCase):
                          ["INVALIDA", "INVALIDA", "2,0", "Verdadero", "t"][:2] + ["2,0", "Verdadero", "t"])
 
     def test_entero_en_variable_real(self):
-        self.assertEqual(ejecutar("r Real;\nr = Captura.Entero();\nMensaje.Texto(r);", ["7"]), ["7,0"])
+        # una asignación (no una lectura) sí puede guardar un Entero en un Real: el PDF permite «cualquier asignación»
+        self.assertEqual(ejecutar("r Real;\nr = 7;\nMensaje.Texto(r);"), ["7,0"])
+        self.assertEqual(ejecutar("r Real;\nr = Captura.Real();\nMensaje.Texto(r);", ["7"]), ["7,0"])
 
     def test_division_por_cero_en_ejecucion(self):
         self.assertEqual(ejecutar("x Entero;\nr Real;\nx = 0;\nr = 5 / x;")[-1], "RUN:E-EJE-02")

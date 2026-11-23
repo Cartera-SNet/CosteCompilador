@@ -174,7 +174,7 @@ PROGRAMAS = [
      "Mensaje.Texto(-(2 + 3) * 2);\nMensaje.Texto(-2,5);", []),
     ("precedencia", "Mensaje.Texto(2 + 3 * 4);\nMensaje.Texto((2 + 3) * 4);\nMensaje.Texto(10 - 2 - 3);\nMensaje.Texto(100 / 10 / 5);\nMensaje.Texto(7 - 2 * 3 + 1);", []),
     ("entero_en_real",
-     "r Real;\nr = 7;\nMensaje.Texto(r);\nr = Captura.Entero();\nMensaje.Texto(r);\nr = r + 1;\nMensaje.Texto(r);", ["12"]),
+     "r Real;\nr = 7;\nMensaje.Texto(r);\nr = 12;\nMensaje.Texto(r);\nr = r + 1;\nMensaje.Texto(r);", []),
     ("lectura_de_todo",
      "n Texto; e Entero; r Real; l Logico;\nn = Captura.Texto();\ne = Captura.Entero();\nr = Captura.Real();\nl = Captura.Logico();\n"
      "Mensaje.Texto(n + \"|\" + e + \"|\" + r + \"|\" + l);", ["  Ana  Pérez ", " 42 ", "2,5", "FALSO"]),

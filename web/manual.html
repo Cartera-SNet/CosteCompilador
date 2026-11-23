@@ -86,7 +86,9 @@ Proceso finalizado correctamente.</pre>
     <li>Toda variable se <strong>declara antes de usarla</strong>, una sola vez, y <strong>fuera de los <code>Si</code></strong> (lo mejor es al inicio del programa).</li>
     <li>El nombre empieza con una letra; después puede tener letras sin tilde (la ñ sí), números y guion bajo. Máximo 30 caracteres. <code>edad</code> y <code>Edad</code> son variables distintas.</li>
     <li><strong>Una variable no puede llamarse como un tipo de dato ni como una palabra reservada</strong>, ni siquiera cambiando las mayúsculas: <code>entero Entero;</code> es un error. Sí se puede usar un nombre que <em>contenga</em> la palabra, como <code>miEntero</code> o <code>enteros</code>.</li>
-    <li>Una variable solo guarda valores de su tipo. La única conversión automática es guardar un <code>Entero</code> en una variable <code>Real</code>.</li>
+    <li>Una variable solo guarda valores de su tipo. La única conversión automática es guardar un <code>Entero</code> en una variable <code>Real</code> con una asignación (<code>r = 5;</code>).</li>
+    <li><strong>Captura debe ser del tipo de la variable, exactamente:</strong> una variable <code>Real</code> se lee con <code>Captura.Real()</code>; <code>r = Captura.Entero();</code> es un error, igual que leer un <code>Real</code> en una variable <code>Entero</code>.</li>
+    <li><code>Mensaje.Texto(…)</code> y <code>Captura.Tipo()</code> se escriben <strong>todo juntos</strong>, sin espacios ni saltos de línea entre sus partes.</li>
     <li>Una variable debe tener un valor (asignado o leído con <code>Captura</code>) antes de usarse.</li>
     <li>Los <strong>decimales llevan coma</strong>.</li>
   </ul>
@@ -129,7 +131,7 @@ Proceso finalizado correctamente.</pre>
 <div class="grupo-reglas">
   <h3>E. Condicionales: Si, Sino, FinSi</h3>
   <ul>
-    <li>Se escribe <code>Si</code>, <strong>un espacio</strong> y la condición <strong>entre paréntesis</strong>: <code>Si (edad >= 18)</code>.</li>
+    <li>Se escribe <code>Si</code>, <strong>exactamente un espacio</strong> y la condición <strong>entre paréntesis</strong>: <code>Si (edad >= 18)</code>. Ni <code>Si(edad >= 18)</code> (sin espacio) ni <code>Si  (edad >= 18)</code> (con dos): las dos son errores.</li>
     <li>La condición debe dar <code>Verdadero</code> o <code>Falso</code>: una comparación, o una variable <code>Logico</code>.</li>
     <li><code>Sino</code> es opcional y solo puede haber uno por cada <code>Si</code>.</li>
     <li>Todo <code>Si</code> termina con <code>FinSi</code>.</li>

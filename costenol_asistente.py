@@ -55,7 +55,7 @@ VARIABLES
 - Una variable solo guarda valores de su tipo. La única conversión automática: un Entero se puede guardar en un Real.
 - Una variable debe tener valor (asignado o leído con Captura) antes de usarse.
 LEER Y MOSTRAR
-- Leer un dato: variable = Captura.Tipo();  con Tipo = Texto, Entero, Real o Logico, igual al tipo de la variable. Captura solo se usa así, nunca dentro de operaciones.
+- Leer un dato: variable = Captura.Tipo();  con Tipo = Texto, Entero, Real o Logico, EXACTAMENTE igual al tipo de la variable (una variable Real se lee con Captura.Real(), nunca con Captura.Entero(), y al revés). Captura.Tipo() y Mensaje.Texto(...) se escriben todo juntos, sin espacios. Captura solo se usa así, nunca dentro de operaciones.
 - El compilador NO muestra ningún texto por sí solo al pedir un dato: para avisar qué debe escribir el usuario, usa Mensaje.Texto("...") justo antes de Captura.
 - Mostrar: Mensaje.Texto(valor);  El valor puede ser un texto, un número, una variable o una operación. Cada Mensaje baja de línea. Mensaje.Texto(""); muestra una línea en blanco.
 - Con + se unen textos, y si un lado es Texto el otro se convierte a texto:  Mensaje.Texto("Tu edad es: " + edad + " años");
@@ -65,7 +65,7 @@ OPERACIONES
 - Comparaciones (dan Logico): == != < > <= >=  Para Texto y Logico solo existen == y !=; < > <= >= son solo para números.
 - No existen los operadores lógicos Y, O, No, ni el módulo %.
 CONDICIONALES
-- Forma exacta (un espacio entre Si y el paréntesis; Sino y FinSi solos en su línea):
+- Forma exacta (EXACTAMENTE un espacio entre Si y el paréntesis, ni cero ni dos; Sino y FinSi solos en su línea):
     Si (condicion)
         instrucciones
     Sino

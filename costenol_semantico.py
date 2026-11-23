@@ -123,7 +123,7 @@ class Analizador:
         simbolo = self.simbolo_destino(n)
         if simbolo is None:
             return
-        if not compatible(simbolo["tipo"], n["tipo_dato"]):
+        if simbolo["tipo"] != n["tipo_dato"]:                        # el tipo de Captura debe ser EXACTAMENTE el de la variable
             self.error("E-SEM-08", n,
                        f"Captura.{n['tipo_dato']}() lee un valor {n['tipo_dato']}, pero '{n['nombre']}' es "
                        f"{simbolo['tipo']}. Use Captura.{simbolo['tipo']}().")
@@ -301,7 +301,7 @@ CATALOGO = {
                  "< > <= >= solo funcionan con números.",
                  "Para Texto y Logico use == o !=."),
     "E-SEM-08": ("Captura no coincide con la variable",
-                 "El tipo de Captura.Tipo() no corresponde al de la variable que recibe el dato.",
+                 "El tipo de Captura.Tipo() debe ser exactamente el de la variable que recibe el dato (ni un Entero en un Real, ni un Real en un Entero).",
                  "Use Captura con el mismo tipo de la variable: edad = Captura.Entero();"),
     "E-SEM-09": ("Variable sin valor",
                  "Se usa una variable antes de asignarle o leerle un valor.",

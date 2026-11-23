@@ -80,6 +80,7 @@ def _nodo(tipo, pos, **campos):
 class Parser:
     def __init__(self, tokens):
         self.t = [x for x in tokens if x.tipo != COMENTARIO]
+        self.comentarios = [x for x in tokens if x.tipo == COMENTARIO]
         self.i = 0
         self.errores = []
         self.avisos = []
@@ -365,18 +366,33 @@ class Parser:
         self.fin_instruccion()
         return _nodo("Asignacion", (nombre.linea, nombre.columna), nombre=nombre.valor, valor=valor)
 
+    def _comentario_entre(self, a, b):
+        """¿Hay un comentario escrito entre los tokens a y b (en la misma línea)?"""
+        return any(c.linea == a.linea == b.linea and a.columna < c.columna < b.columna for c in self.comentarios)
+
+    def _junto(self, anterior, siguiente, codigo, forma):
+        """Mensaje.Texto( y Captura.Tipo() se escriben pegados: sin espacios, comentarios ni saltos de línea."""
+        if siguiente is not None and anterior is not None and (
+                siguiente.linea != anterior.linea or siguiente.antes != "" or self._comentario_entre(anterior, siguiente)):
+            self.fallar(codigo, siguiente,
+                        f"{forma} se escribe todo junto, sin espacios ni saltos de línea entre sus partes "
+                        f"(se encontró {describir(siguiente)} separado).")
+
     def captura(self):
-        self.avanzar()  # Captura
+        cap = self.avanzar()  # Captura
         t = self.actual()
+        if self.es(t, PUNTO):
+            self._junto(cap, t, "E-SIN-14", "Captura.Tipo()")
         if not self.es(t, PUNTO):
             self.fallar("E-SIN-14", t if t is not None else self._fin_anterior(),
                         "Después de Captura debe ir un punto y el tipo: Captura.Texto(), Captura.Entero(), "
                         f"Captura.Real() o Captura.Logico(). Se encontró {describir(t)}.")
-        self.avanzar()
+        punto = self.avanzar()
         t = self.actual()
         if t is not None and t.tipo == PALABRA_RESERVADA and t.valor in TIPOS_DE_DATO:
+            self._junto(punto, t, "E-SIN-14", "Captura.Tipo()")
             tipo = t.valor
-            self.avanzar()
+            tipo_tok = self.avanzar()
         else:
             pista = ""
             if t is not None and t.tipo == IDENTIFICADOR and _sugerencia_reservada(t.valor) in TIPOS_DE_DATO:
@@ -390,11 +406,13 @@ class Parser:
         if not self.es(t, PARENTESIS_APERTURA):
             self.fallar("E-SIN-14", t if t is not None else self._fin_anterior(),
                         f"Falta el paréntesis de apertura: Captura.{tipo}(). Se encontró {describir(t)}.")
-        self.avanzar()
+        self._junto(tipo_tok, t, "E-SIN-14", "Captura.Tipo()")
+        abre = self.avanzar()
         t = self.actual()
         if not self.es(t, PARENTESIS_CIERRE):
             self.fallar("E-SIN-14", t if t is not None else self._fin_anterior(),
                         f"Captura.{tipo}() lleva los paréntesis vacíos y cerrados. Se encontró {describir(t)}.")
+        self._junto(abre, t, "E-SIN-14", "Captura.Tipo()")
         self.avanzar()
         return tipo
 
@@ -404,19 +422,23 @@ class Parser:
         if not self.es(t, PUNTO):
             self.fallar("E-SIN-15", t if t is not None else self._fin_anterior(),
                         f"Después de Mensaje debe ir un punto y Texto: Mensaje.Texto(\"...\"). Se encontró {describir(t)}.")
-        self.avanzar()
+        self._junto(m, t, "E-SIN-15", "Mensaje.Texto(...)")
+        punto = self.avanzar()
         t = self.actual()
+        if self.es_reservada(t, "Texto"):
+            self._junto(punto, t, "E-SIN-15", "Mensaje.Texto(...)")
         if not self.es_reservada(t, "Texto"):
             pista = ""
             if t is not None and t.tipo == IDENTIFICADOR and _sugerencia_reservada(t.valor) == "Texto":
                 pista = " Las mayúsculas importan: se escribe Texto con la T mayúscula."
             self.fallar("E-SIN-15", t if t is not None else self._fin_anterior(),
                         f"Mensaje solo tiene la opción Texto: Mensaje.Texto(...). Se encontró {describir(t)}.{pista}")
-        self.avanzar()
+        texto_tok = self.avanzar()
         t = self.actual()
         if not self.es(t, PARENTESIS_APERTURA):
             self.fallar("E-SIN-15", t if t is not None else self._fin_anterior(),
                         f"Falta el paréntesis de apertura: Mensaje.Texto(...). Se encontró {describir(t)}.")
+        self._junto(texto_tok, t, "E-SIN-15", "Mensaje.Texto(...)")
         abre = self.avanzar()
         if self.es(self.actual(), PARENTESIS_CIERRE):
             self.fallar("E-SIN-15", self.actual(),
@@ -443,10 +465,27 @@ class Parser:
                        f"Se encontró {describir(sig)}.")
             self._saltar_renglon(t_si.linea)
         else:
-            if sig.linea == t_si.linea and sig.columna == t_si.columna + len(t_si.valor):
+            if sig.linea != t_si.linea:
+                self.error("E-SIN-06", (t_si.linea, t_si.columna + len(t_si.valor)),
+                           "Después de Si debe ir un espacio y la condición entre paréntesis, en la misma línea: "
+                           "Si (condición). El paréntesis está en otra línea.")
+            elif sig.antes == "":
                 self.error("E-SIN-13", sig,
                            "Falta un espacio entre Si y el paréntesis: se escribe Si (condición), "
                            "con un espacio antes del '('.")
+            elif sig.antes != " " or self._comentario_entre(t_si, sig):
+                cuantos = len(sig.antes)
+                if self._comentario_entre(t_si, sig):
+                    que = "un comentario"
+                elif set(sig.antes) == {" "}:
+                    que = f"{cuantos} espacios"
+                elif set(sig.antes) == {"\t"}:
+                    que = "un tabulador" if cuantos == 1 else f"{cuantos} tabuladores"
+                else:
+                    que = "espacios y tabuladores mezclados"
+                self.error("E-SIN-29", sig,
+                           f"Entre Si y el paréntesis debe haber exactamente un espacio, y hay {que}: "
+                           "se escribe Si (condición).")
             abre = self.avanzar()
             try:
                 if self.es(self.actual(), PARENTESIS_CIERRE):
@@ -717,6 +756,9 @@ CATALOGO = {
     "E-SIN-28": ("Falta un operador entre dos valores",
                  "Hay dos valores seguidos sin operador entre ellos: por ejemplo 1( o 5 5. Un número no puede ir pegado a un paréntesis ni a otro valor.",
                  "Escriba un operador: 1 * (2 + 3)   o   5 + 5. Si eran dos instrucciones, agregue el ;"),
+    "E-SIN-29": ("Sobran espacios después de Si",
+                 "Entre Si y el paréntesis va exactamente un espacio, ni más ni menos.",
+                 "Escriba Si (condición) con un solo espacio."),
     "E-SIN-97": ("Error interno del analizador sintáctico",
                  "Falló algo inesperado en el programa.",
                  "Vuelva a intentarlo; si se repite, avise al equipo desarrollador."),

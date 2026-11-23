@@ -68,10 +68,12 @@ Reglas que no se ven en la gramática (las implementan las fases indicadas):
 |---|---|---|
 | Mayúsculas y minúsculas importan | léxica/sintáctica | E-SIN-26 |
 | Un nombre no puede ser palabra reservada ni tipo (ni cambiando mayúsculas): `entero Entero;` es error | sintáctica | E-SIN-27 |
-| `Si` va seguido de un espacio y `(`; `Sino` y `FinSi` solos en su línea; todo `Si` termina en `FinSi` | sintáctica | E-SIN-13/12/09 |
+| `Si` va seguido de **exactamente un espacio** y `(` en la misma línea; `Sino` y `FinSi` solos en su línea; todo `Si` termina en `FinSi` | sintáctica | E-SIN-13/29/06/12/09 |
+| `Mensaje.Texto(…)` y `Captura.Tipo()` se escriben todo juntos: sin espacios, comentarios ni saltos de línea entre sus partes | sintáctica | E-SIN-14/15 |
 | Entre dos valores va un operador (`1(` es error); todo `(` se cierra | sintáctica | E-SIN-28/05 |
 | Variables declaradas antes de usarse, una vez, fuera de los `Si` | sintáctica/semántica | E-SIN-16, E-SEM-01/02 |
-| Tipos compatibles; `Entero` cabe en `Real`; `/` siempre da `Real` | semántica | E-SEM-03/04/06/07 |
+| Tipos compatibles; en una asignación un `Entero` cabe en un `Real`; `/` siempre da `Real` | semántica | E-SEM-03/04/06/07 |
+| **`Captura.Tipo()` debe ser exactamente del tipo de la variable** (ni un `Entero` en un `Real`, ni al revés) | semántica | E-SEM-08 |
 | La condición del `Si` es `Logico` | semántica | E-SEM-05 |
 | Una variable debe tener valor antes de usarse | semántica | E-SEM-09 |
 | Decimales con coma; enteros hasta 2147483647 | léxica | E-LEX-05/07 |
@@ -256,6 +258,7 @@ Ninguna entrada debe hacer fallar el programa: toda fase termina con un diagnós
 |---|---|
 | `pruebas_lexico.py` | Tokens y errores léxicos. |
 | `pruebas_compilador.py` | Sintaxis, semántica, ejecución, notas de clase del profesor, topes, entradas inesperadas, ejemplos del manual y de la carpeta `ejemplos/`. |
+| `pruebas_reglamento.py` | **Matriz del reglamento:** cada regla del PDF y de las notas de clase con casos que se aceptan y casos que se rechazan (con su código). `python pruebas_reglamento.py --informe` imprime la matriz en Markdown. |
 | `pruebas_dialecto.py` | Formato de los mensajes en costeño y que cada código tenga su frase. |
 | `pruebas_asistente.py` | El asistente con un servidor falso de la API (sin gastar dinero). |
 | `pruebas_servidor.py` | Rutas, seguridad, modo nube, límites. |
